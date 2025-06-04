@@ -1,0 +1,16 @@
+{
+  "name": "cloudinary_auth_demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cloudinary": "^2.6.1",
+    "glob": "^11.0.2"
+  }
+}

@@ -1,0 +1,32 @@
+# OSごとの不要ファイル
+.DS_Store
+Thumbs.db
+
+# Node.jsプロジェクトの場合（Netlify CLI使用時など）
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 環境変数や秘密鍵など
+.env
+.env.*
+
+# VSCodeなどエディタ用設定
+.vscode/
+.idea/
+*.sw?
+
+# ビルド/出力フォルダ（使っていれば）
+dist/
+build/
+out/
+
+# Gitに不要な一時ファイル
+*.bak
+*.tmp
+*.log
+*.zip
+
+# 出力した署名付きURLリスト
+*signed_urls.txt
