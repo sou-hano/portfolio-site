@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- 検索エンジンからのインデックス禁止、ページ内リンクもたどらせない -->
+    <meta name="robots" content="noindex, nofollow">
+    <title>Portfolio</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2em;
+            background: #f9f9f9;
+            text-align: center;
+        }
+
+        img {
+            max-width: 90%;
+            height: auto;
+            margin: 1em 0;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .section {
+            margin-bottom: 2em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Portfolio Images</h1>
+  <div id="image-container"></div>
+
+  <script>
+    // JSONファイルの読み込み
+    fetch('./portfolio_images_signed_urls.json')
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('image-container');
+
+        // 署名付きURLマップの各画像について処理
+        Object.entries(data).forEach(([publicId, signedUrl]) => {
+          const section = document.createElement('div');
+          section.className = 'section';
+
+          const img = document.createElement('img');
+          img.src = signedUrl;
+          img.alt = publicId.split('/').pop(); // 最後の名前だけ使う
+
+          const title = document.createElement('h2');
+          title.textContent = decodeURIComponent(publicId.split('/').pop());
+
+          section.appendChild(img);
+          section.appendChild(title);
+          container.appendChild(section);
+        });
+      })
+      .catch(error => {
+        console.error("画像の読み込みに失敗しました:", error);
+      });
+  </script>
+</body>
+
+</html>

@@ -1,6 +1,6 @@
-const fs = require('fs'); // 署名付きURL出力先ファイル操作用モジュール
-const cloudinary = require('cloudinary').v2; // Cloudinary SDK
-const path = require('path'); // 出力ファイルのパス操作用
+const fs = require('fs');                       // 署名付きURL出力先ファイル操作用モジュール
+const cloudinary = require('cloudinary').v2;    // Cloudinary SDK
+const path = require('path');                   // 出力ファイルのパス操作用
 
 // Cloudinaryアカウント情報
 cloudinary.config({
@@ -11,33 +11,28 @@ cloudinary.config({
 
 // コマンドラインから署名を付ける画像フォルダを取得
 const folderName = process.argv[2];
-if (!folderName) 
-{
+if (!folderName) {
     console.error('Cloudinary上のフォルダ名を指定してください: node generate_signed_urls_from_folder.js <Cloudinaryフォルダ名>');
     process.exit(1);
 }
 
-// 署名付きURL出力先 (.txt)
-const outputFilePath = path.resolve('./' + folderName + '_signed_urls.txt');
-
 // 認証期間（秒数換算で大まかに指定）
 const expiresAt = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30 * 18); // 現在から約18か月
 
-// 出力ファイルを初期化（上書き）
-fs.writeFileSync(outputFilePath, `【フォルダ: ${folderName} の署名付きURL一覧】\n\n`);
+// 署名付きURL出力先パス（JSON）
+const jsonOutputPath = path.resolve(`./public/${folderName}_signed_urls.json`);
+const urlMap = {};
 
 // 指定フォルダ内の画像のpublic IDを取得（非同期）
 // next_cursor によって複数ページにまたがる結果もすべて取得する
-const getResourcesInFolder = async (folder, nextCursor = null, results = []) => 
-{
-    const options = 
+const getResourcesInFolder = async (folder, nextCursor = null, results = []) => {
+    const options =
     {
         type: 'authenticated',
         prefix: folder + '/',   // 指定フォルダ以下のpublic_idのみ
         max_results: 100,       // 最大件数
     };
-    if (nextCursor)
-    {
+    if (nextCursor) {
         options.next_cursor = nextCursor; // 2ページ目以上の取得に使用
     }
 
@@ -45,13 +40,11 @@ const getResourcesInFolder = async (folder, nextCursor = null, results = []) =>
     const response = await cloudinary.api.resources(options);
     results.push(...response.resources);
 
-    if (response.next_cursor)
-    {
+    if (response.next_cursor) {
         // 次のページがある場合は再帰的に取得 (自身を再度実行)
         return getResourcesInFolder(folder, response.next_cursor, results);
     }
-    else
-    {
+    else {
         return results;
     }
 };
@@ -63,15 +56,13 @@ const getResourcesInFolder = async (folder, nextCursor = null, results = []) =>
     try {
         const resources = await getResourcesInFolder(folderName);
 
-        if (resources.length === 0)
-        {
+        if (resources.length === 0) {
             console.log(`フォルダ "${folderName}" に画像が見つかりませんでした。`);
             return;
         }
 
         // 各画像に対して署名付きURLを生成
-        for (const res of resources)
-        {
+        for (const res of resources) {
             const publicId = res.public_id;
 
             // 署名付きURL生成 (非同期)
@@ -80,16 +71,18 @@ const getResourcesInFolder = async (folder, nextCursor = null, results = []) =>
                 sign_url: true,
                 expires_at: expiresAt,
                 transformation: [
-                    { quality: "auto", fetch_format: "auto" } // 表示環境に応じて画質を最適化
+                    { quality: "auto", fetch_format: "auto" } // 表示環境に応じて画質・拡張子を最適化
                 ]
             });
 
-            fs.appendFileSync(outputFilePath, `${publicId}：\n${signedUrl}\n\n`);
+            urlMap[publicId] = signedUrl;
             console.log(`${publicId} -> 生成完了`);
         }
-        console.log(`\n完了：${resources.length} 件のURLを "${outputFilePath}" に出力しました。`);
-    } catch (error)
-    {
+
+        fs.writeFileSync(jsonOutputPath, JSON.stringify(urlMap, null, 2), 'utf-8');
+        console.log(`\n完了：${resources.length} 件のURLを "${jsonOutputPath}" に出力しました。`);
+
+    } catch (error) {
         console.error("エラー:", error.message);
     }
 })();

@@ -1,9 +1,10 @@
 {
-  "name": "cloudinary_auth_demo",
+  "name": "website_portfolio",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "upload": "node cloudinary/upload_authenticated_images.js ./Images portfolio_images",
+    "sign": "node cloudinary/generate_signed_url.js portfolio_images"
   },
   "keywords": [],
   "author": "",

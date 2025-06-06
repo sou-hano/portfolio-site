@@ -28,8 +28,8 @@ out/
 *.log
 *.zip
 
-# 出力した署名付きURLリスト
-*signed_urls.txt
-
-# 画像
+# Cloudinaryアップロード用のローカル画像一時保管場所
 images/
+
+# Node
+node_modules/
