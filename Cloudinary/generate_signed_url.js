@@ -9,7 +9,7 @@ cloudinary.config({
     api_secret: 'tTjVKEUOdBeW8Nt_t2UGThyP6LM',
 });
 
-// コマンドラインから署名を付ける画像フォルダを取得
+// コマンドラインから署名を付けるCloudinaryのベースフォルダ名を取得
 const folderName = process.argv[2];
 if (!folderName) {
     console.error('Cloudinary上のフォルダ名を指定してください: node generate_signed_urls_from_folder.js <Cloudinaryフォルダ名>');
@@ -19,9 +19,8 @@ if (!folderName) {
 // 認証期間（秒数換算で大まかに指定）
 const expiresAt = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30 * 18); // 現在から約18か月
 
-// 署名付きURL出力先パス（JSON）
-const jsonOutputPath = path.resolve(`./public/${folderName}_signed_urls.json`);
-const urlMap = {};
+// サブフォルダ単位で分類して.jsonに格納する
+const genreUrlMap = {};
 
 // 指定フォルダ内の画像のpublic IDを取得（非同期）
 // next_cursor によって複数ページにまたがる結果もすべて取得する
@@ -61,9 +60,13 @@ const getResourcesInFolder = async (folder, nextCursor = null, results = []) => 
             return;
         }
 
-        // 各画像に対して署名付きURLを生成
+        // 画像ごとにジャンルを判定し、署名付きURLをマッピング
         for (const res of resources) {
-            const publicId = res.public_id;
+            const publicId = res.public_id;  // 例: portfolio_images/original/cat
+            const pathParts = publicId.replace(`${folderName}/`, '').split('/'); // /で区切る ['original', 'cat']
+            const genre = pathParts[0]; // サブフォルダ名をジャンル名に
+
+            if (!genreUrlMap[genre]) genreUrlMap[genre] = {};
 
             // 署名付きURL生成 (非同期)
             const signedUrl = cloudinary.url(publicId, {
@@ -75,12 +78,23 @@ const getResourcesInFolder = async (folder, nextCursor = null, results = []) => 
                 ]
             });
 
-            urlMap[publicId] = signedUrl;
-            console.log(`${publicId} -> 生成完了`);
+            genreUrlMap[genre][publicId] = signedUrl;
+            console.log(`${publicId} -> ${genre} に分類`);
         }
 
-        fs.writeFileSync(jsonOutputPath, JSON.stringify(urlMap, null, 2), 'utf-8');
-        console.log(`\n完了：${resources.length} 件のURLを "${jsonOutputPath}" に出力しました。`);
+        // 出力フォルダがなければ作成
+        const outputDir = path.resolve(`./public/signed_urls`);
+        if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+
+        // ジャンルごとに .json 出力
+        for (const [genre, urlMap] of Object.entries(genreUrlMap)) {
+            const outputPath = path.join(outputDir, `${genre}.json`);
+            fs.writeFileSync(outputPath, JSON.stringify(urlMap, null, 2), 'utf-8');
+            console.log(`${genre}.json に ${Object.keys(urlMap).length} 件出力`);
+        }
+
+        console.log(`\n完了：${Object.keys(genreUrlMap).length} ジャンルのURLを出力しました。`);
+
 
     } catch (error) {
         console.error("エラー:", error.message);

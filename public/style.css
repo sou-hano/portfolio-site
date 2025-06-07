@@ -1,0 +1,158 @@
+/* ------------------------------
+   全体の初期設定（背景・文字・余白リセット）
+--------------------------------- */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', sans-serif; /* 基本文字フォント */
+  background-color: #fdfdfd;
+  color: #333; /* 全体の文字色 */
+}
+
+/* ------------------------------
+ ヘッダー全体（固定表示）
+--------------------------------- */
+/* <header id="main-header"> に適用 */
+header#main-header {
+  position: fixed;     /* ページ上部に固定表示 */
+  top: 0;
+  width: 100%;
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+  z-index: 1000;       /* 他要素より上に重ねる */
+}
+
+/* タイトルロゴ画像の高さを整える */
+.site-title img {
+  height: 60px;
+  width: auto;
+}
+
+/* main-nav内 <ul> に適用 */
+.main-nav ul {
+  display: flex;     /* 横並びにする */
+  list-style: none;  /* 箇条書きマーク除去 */
+  padding: 0 1em;
+  margin: 0;
+  gap: 1em;          /* 各メニューの間隔 */
+}
+
+/* main-nav内 <a> 要素（リンク）に適用 */
+.main-nav a {
+  text-decoration: none; /* リンクの下線を消す */
+  color: #333;
+  font-weight: 500;      /* 通常よりやや太めの文字 */
+}
+
+/* ------------------------------
+ サブナビゲーションメニュー（ジャンル切替）
+--------------------------------- */
+/* sub-nav に適用 */
+.sub-nav {
+  padding: 0.5em 1em;
+  background-color: #f3f3f3;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+/* sub-nav内 <ul> に適用 */
+.sub-nav ul {
+  list-style: none;
+  display: flex;  /* 横並び */
+  gap: 1em;
+  padding: 0;
+  margin: 0;
+}
+
+/* sub-nav内 <a>（各ジャンルへのリンク）に適用 */
+.sub-nav a {
+  text-decoration: none;
+  color: #555;
+  font-size: 0.9em;  /* 少し小さめの文字サイズ */
+}
+
+/* ------------------------------
+ メイン表示領域
+--------------------------------- */
+/* main に適用 */
+main {
+  padding-top: 140px;   /* ヘッダー固定分の余白確保 */
+  max-width: 1200px;    /* 中央寄せ＆幅制限 */
+  margin: auto;
+}
+
+/* .page クラス：各ページ（初期は非表示） */
+.page {
+  display: none;
+}
+
+/* .active-page：現在表示中のページのみ表示 */
+.page.active-page {
+  display: block;
+}
+
+/* ------------------------------
+ 各ジャンルのセクション見出しと余白
+--------------------------------- */
+/* genre-section に適用 */
+.genre-section {
+  padding: 2em 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* <h2>（ジャンルの見出し）に適用 */
+.genre-section h2 {
+  font-size: 1.4em;
+  margin-bottom: 1em;
+}
+
+/* ------------------------------
+ 画像表示エリア
+--------------------------------- */
+/* image-container に適用（画像一覧用） */
+.image-container {
+  display: flex;           /* 横並び＋折返し */
+  flex-wrap: wrap;
+  gap: 1em;
+  justify-content: center;
+}
+
+/* image-container内 <img> に適用 */
+.image-container img {
+  max-width: 500px;
+  width: 100%;             /* 親幅にフィット */
+  height: auto;            /* アスペクト比維持 */
+  border-radius: 6px;      /* 角丸にする */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* 軽い影で浮き上がり効果 */
+}
+
+/* ------------------------------
+ フッター（ページ最下部）
+--------------------------------- */
+/* <footer> に適用 */
+footer {
+  text-align: center;
+  margin-top: 4em;
+  padding: 2em 1em;
+  background-color: #fafafa;
+  border-top: 1px solid #ccc;
+}
+
+/* footer-nav内 <ul> に適用 */
+.footer-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1em;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1em;
+}
+
+/* フッター内リンク */
+.footer-nav a {
+  text-decoration: none;
+  color: #666;
+  font-size: 0.9em;
+}

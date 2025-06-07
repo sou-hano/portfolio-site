@@ -2,64 +2,122 @@
 <html lang="ja">
 
 <head>
-    <meta charset="UTF-8">
-    <!-- 検索エンジンからのインデックス禁止、ページ内リンクもたどらせない -->
-    <meta name="robots" content="noindex, nofollow">
-    <title>Portfolio</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 2em;
-            background: #f9f9f9;
-            text-align: center;
-        }
-
-        img {
-            max-width: 90%;
-            height: auto;
-            margin: 1em 0;
-            border: 1px solid #ccc;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .section {
-            margin-bottom: 2em;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <!-- 個人情報保護用：検索エンジンからのインデックス禁止、外部リンクからもたどらせない -->
+  <meta name="robots" content="noindex, nofollow">
+  <!-- スマートフォン・タブレットでのレスポンシブ表示（画面幅に合わせてCSS切り替え）を有効化 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio</title>
+  <!-- 外部CSSファイルの読み込み -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>Portfolio Images</h1>
-  <div id="image-container"></div>
+  <!-- ヘッダー：ページ・セクション切替メニュー -->
+  <header id="main-header">
+    <!-- サイトロゴ -->
+    <div class="site-title" id="site-logo">
+      <!-- JavaScriptでロゴが挿入 -->
+    </div>
 
-  <script>
-    // JSONファイルの読み込み
-    fetch('./portfolio_images_signed_urls.json')
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById('image-container');
+    <!-- メインページ切替ナビゲーション -->
+    <nav class="main-nav">
+      <ul>
+        <li><a href="#" data-page="main-page">イラスト</a></li>
+        <!--<li><a href="#" data-page="stack-page">技術スタック</a></li>-->
+        <li><a href="#" data-page="profile-page">About Me</a></li>
+      </ul>
+    </nav>
 
-        // 署名付きURLマップの各画像について処理
-        Object.entries(data).forEach(([publicId, signedUrl]) => {
-          const section = document.createElement('div');
-          section.className = 'section';
+    <!-- サブナビゲーション：各ページごとに表示切替される -->
+    <nav class="sub-nav" id="sub-nav-main">
+      <ul>
+        <li><a href="#original">オリジナル</a></li>
+        <li><a href="#fanart">二次創作</a></li>
+        <li><a href="#collab">合作</a></li>
+      </ul>
+    </nav>
+    <!--
+    <nav class="sub-nav" id="sub-nav-stack" style="display: none;">
+      <ul>
+        <li><a href="#work1">製作物1</a></li>
+        <li><a href="#work2">製作物2</a></li>
+      </ul>
+    </nav>
+  -->
+    <nav class="sub-nav" id="sub-nav-profile" style="display: none;">
+      <ul>
+        <li><a href="#history">About Me</a></li>
+      </ul>
+    </nav>
+  </header>
 
-          const img = document.createElement('img');
-          img.src = signedUrl;
-          img.alt = publicId.split('/').pop(); // 最後の名前だけ使う
 
-          const title = document.createElement('h2');
-          title.textContent = decodeURIComponent(publicId.split('/').pop());
+  <!-- メイン表示領域：各セクションをSPA形式で表示切替 -->
+  <main>
+    <!-- メインページ：オリジナル・二次創作・合作 -->
+    <section id="main-page" class="page active-page">
+      <section class="genre-section">
+        <h2>Original画像テスト</h2>
+        <div class="image-container" id="original-image-test"></div>
+      </section>
+      <section id="original" class="genre-section">
+        <h2>オリジナルイラスト</h2>
+        <div class="image-container" data-genre="original"></div>
+      </section>
+      <section id="fanart" class="genre-section">
+        <h2>二次創作イラスト</h2>
+        <div class="image-container" data-genre="fanart"></div>
+      </section>
+      <section id="collab" class="genre-section">
+        <h2>合作イラスト</h2>
+        <div class="image-container" data-genre="collab"></div>
+      </section>
+    </section>
 
-          section.appendChild(img);
-          section.appendChild(title);
-          container.appendChild(section);
-        });
-      })
-      .catch(error => {
-        console.error("画像の読み込みに失敗しました:", error);
-      });
-  </script>
+    <!-- 技術スタックページ -->
+    <!--
+    <section id="stack-page" class="page">
+      <section id="work1">
+        <h2>製作物1</h2>
+        <div class="image-container" data-genre="tech"></div>
+      </section>
+      <section id="work2">
+        <h2>製作物2</h2>
+        <div class="image-container" data-genre="tech"></div>
+      </section>
+    </section>
+    -->
+
+    <!-- ユーザー情報ページ -->
+    <section id="profile-page" class="page">
+      <section id="history">
+        <h2>About Me</h2>
+        <p>ここに自己紹介などを記述</p>
+      </section>
+    </section>
+  </main>
+
+
+  <!-- フッター：ページ下部のリンク・著作情報 -->
+  <footer>
+    <nav class="footer-nav">
+      <ul>
+        <li><a href="#original">オリジナル</a></li>
+        <li><a href="#fanart">二次創作</a></li>
+        <li><a href="#collab">合作</a></li>
+        <!--
+        <li><a href="#work1">製作物1</a></li>
+        <li><a href="#work2">製作物2</a></li>
+        -->
+        <li><a href="#history">About Me</a></li>
+      </ul>
+    </nav>
+    <small>&copy; 2025 Soichiro Hano's Illustration Portfolio</small>
+  </footer>
+
+  <!-- メインの制御用JavaScriptファイルを読み込み -->
+  <script src="main.js"></script>
 </body>
 
 </html>
