@@ -68,11 +68,12 @@ fetch('signed_urls/original.json')
                     showModal(item);
                 });
                 // スマホ用
+                /*
                 img.addEventListener("touchstart", e => {
                     e.preventDefault();
                     showModal(item);
                 }, { passive: false });
-
+                */
                 container.appendChild(img);
             }
             else {
