@@ -58,17 +58,15 @@
     <!-- メインページ：オリジナル・二次創作・合作 -->
     <section id="main-page" class="page active-page">
       <section class="genre-section">
-        <h2>Original画像テスト</h2>
+        <h2>Originals</h2>
         <div class="image-container" id="original-image-test"></div>
       </section>
-      <section id="original" class="genre-section">
-        <h2>オリジナルイラスト</h2>
-        <div class="image-container" data-genre="original"></div>
-      </section>
+
       <section id="fanart" class="genre-section">
         <h2>二次創作イラスト</h2>
         <div class="image-container" data-genre="fanart"></div>
       </section>
+
       <section id="collab" class="genre-section">
         <h2>合作イラスト</h2>
         <div class="image-container" data-genre="collab"></div>
@@ -116,8 +114,37 @@
     <small>&copy; 2025 Soichiro Hano's Illustration Portfolio</small>
   </footer>
 
+
+  <!-- 画像クリック時に表示されるモーダル構造（オーバーレイ表示）、Bodyの最後に書く、ページ全体に1つでOK -->
+  <div id="image-modal" class="modal">
+    <span class="modal-close">&times;</span>
+
+    <div class="modal-body">
+      <img class="modal-content" id="modal-image">
+      <div id="modal-caption">
+        <h3 id="modal-title"></h3>
+        <p id="modal-description"></p>
+      </div>
+    </div>
+  </div>
+
   <!-- メインの制御用JavaScriptファイルを読み込み -->
+  <!-- 中でモーダル構造を読み込むためモーダル構造構造より後に書く -->
   <script src="main.js"></script>
+
+  <div id="image-modal" style="
+  display: block;
+  z-index: 9999;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(255, 0, 0, 0.7);
+  color: white;
+  text-align: center;
+  padding-top: 20%;
+">
+  <h2>診断モーダル</h2>
+  <p>この赤い領域が実機で見えれば、JSは問題ありません</p>
+</div>
 </body>
 
 </html>

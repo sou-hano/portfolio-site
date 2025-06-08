@@ -1,12 +1,14 @@
+require('dotenv').config(); // .env 読み込み
+
 const fs = require('fs');                       // 署名付きURL出力先ファイル操作用モジュール
 const cloudinary = require('cloudinary').v2;    // Cloudinary SDK
 const path = require('path');                   // 出力ファイルのパス操作用
 
 // Cloudinaryアカウント情報
 cloudinary.config({
-    cloud_name: 'dihjz2opk',
-    api_key: '431651465559666',
-    api_secret: 'tTjVKEUOdBeW8Nt_t2UGThyP6LM',
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 // コマンドラインから署名を付けるCloudinaryのベースフォルダ名を取得
@@ -60,13 +62,31 @@ const getResourcesInFolder = async (folder, nextCursor = null, results = []) => 
             return;
         }
 
-        // 画像ごとにジャンルを判定し、署名付きURLをマッピング
+        // 出力先ディレクトリ
+        const outputDir = path.resolve(`./public/signed_urls`);
+        if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+
+        // 事前に既存ファイルを読み込んで genreUrlMap に追加
+        const knownGenres = new Set(resources.map(res =>
+            res.public_id.replace(`${folderName}/`, '').split('/')[0]
+        ));
+
+        for (const genre of knownGenres) {
+            const jsonPath = path.join(outputDir, `${genre}.json`);
+            if (fs.existsSync(jsonPath)) {
+                const oldJson = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+                genreUrlMap[genre] = oldJson;
+            } else {
+                genreUrlMap[genre] = {};
+            }
+        }
+
+        // 画像ごとにジャンルを判定し、署名付きURLを生成＆既存のtitle/descriptionととマージ
         for (const res of resources) {
             const publicId = res.public_id;  // 例: portfolio_images/original/cat
             const pathParts = publicId.replace(`${folderName}/`, '').split('/'); // /で区切る ['original', 'cat']
             const genre = pathParts[0]; // サブフォルダ名をジャンル名に
-
-            if (!genreUrlMap[genre]) genreUrlMap[genre] = {};
+            const fileName = pathParts.slice(-1)[0]; // ファイル名
 
             // 署名付きURL生成 (非同期)
             const signedUrl = cloudinary.url(publicId, {
@@ -78,13 +98,17 @@ const getResourcesInFolder = async (folder, nextCursor = null, results = []) => 
                 ]
             });
 
-            genreUrlMap[genre][publicId] = signedUrl;
+            const existing = genreUrlMap[genre]?.[publicId] || {};
+
+            // タイトルと説明は既存の.jsonを参照、なければ初期値
+            genreUrlMap[genre][publicId] = {
+                url: signedUrl,
+                title: existing.title || fileName,
+                description: existing.description || ""
+            };
+
             console.log(`${publicId} -> ${genre} に分類`);
         }
-
-        // 出力フォルダがなければ作成
-        const outputDir = path.resolve(`./public/signed_urls`);
-        if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
         // ジャンルごとに .json 出力
         for (const [genre, urlMap] of Object.entries(genreUrlMap)) {

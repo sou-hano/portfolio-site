@@ -1,3 +1,5 @@
+require('dotenv').config(); // .env 読み込み
+
 const fs = require('fs');                     // 署名付きURL出力先ファイル操作用モジュール
 const path = require('path');
 const glob = require('glob');
@@ -5,9 +7,9 @@ const cloudinary = require('cloudinary').v2;  // Cloudinary SDK
 
 // Cloudinary設定
 cloudinary.config({
-  cloud_name: 'dihjz2opk',
-  api_key: '431651465559666',
-  api_secret: 'tTjVKEUOdBeW8Nt_t2UGThyP6LM'
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 // コマンドライン引数からフォルダパスとCloudinaryフォルダ名を取得

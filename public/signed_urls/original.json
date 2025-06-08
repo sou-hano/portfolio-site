@@ -1,11 +1,47 @@
 {
-  "portfolio_images/original/DearSeraph": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--yb76SJZH--/f_auto,q_auto/v1/portfolio_images/original/DearSeraph?_a=BAMClqXy0",
-  "portfolio_images/original/Dilly-dally": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--tDafoxxP--/f_auto,q_auto/v1/portfolio_images/original/Dilly-dally?_a=BAMClqXy0",
-  "portfolio_images/original/LaTraviata": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--wRiJgLXv--/f_auto,q_auto/v1/portfolio_images/original/LaTraviata?_a=BAMClqXy0",
-  "portfolio_images/original/カモノハシの卵": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--_q_VDZky--/f_auto,q_auto/v1/portfolio_images/original/%E3%82%AB%E3%83%A2%E3%83%8E%E3%83%8F%E3%82%B7%E3%81%AE%E5%8D%B5?_a=BAMClqXy0",
-  "portfolio_images/original/ネコザメの卵": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--N9Y4BfM9--/f_auto,q_auto/v1/portfolio_images/original/%E3%83%8D%E3%82%B3%E3%82%B6%E3%83%A1%E3%81%AE%E5%8D%B5?_a=BAMClqXy0",
-  "portfolio_images/original/桜ねこ": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--nvGTLO9E--/f_auto,q_auto/v1/portfolio_images/original/%E6%A1%9C%E3%81%AD%E3%81%93?_a=BAMClqXy0",
-  "portfolio_images/original/海底撈月": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--Y38LmbnD--/f_auto,q_auto/v1/portfolio_images/original/%E6%B5%B7%E5%BA%95%E6%92%88%E6%9C%88?_a=BAMClqXy0",
-  "portfolio_images/original/真っ赤なお鼻": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s---WinDHcf--/f_auto,q_auto/v1/portfolio_images/original/%E7%9C%9F%E3%81%A3%E8%B5%A4%E3%81%AA%E3%81%8A%E9%BC%BB?_a=BAMClqXy0",
-  "portfolio_images/original/饕餮行脚万圣节": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--SdixLwGj--/f_auto,q_auto/v1/portfolio_images/original/%E9%A5%95%E9%A4%AE%E8%A1%8C%E8%84%9A%E4%B8%87%E5%9C%A3%E8%8A%82?_a=BAMClqXy0"
+  "portfolio_images/original/DearSeraph": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--yb76SJZH--/f_auto,q_auto/v1/portfolio_images/original/DearSeraph?_a=BAMClqXy0",
+    "title": "Dear Seraph",
+    "description": "ウェディングドレスに包まれた天使を描いた作品<br>主への愛を囁く熾天使の美しさと、隠れた危険性を純白の花々で表現<br>「白」をテーマとした部活動の有志制作のイラスト集の表紙として使用<br>東京コミティア2025春にて頒布"
+  },
+  "portfolio_images/original/Dilly-dally": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--tDafoxxP--/f_auto,q_auto/v1/portfolio_images/original/Dilly-dally?_a=BAMClqXy0",
+    "title": "Dilly-dally",
+    "description": "寄り道中の小さな出会い描いた作品。<br>「青」をテーマとした部活動の有志制作のイラスト集に収録。"
+  },
+  "portfolio_images/original/LaTraviata": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--wRiJgLXv--/f_auto,q_auto/v1/portfolio_images/original/LaTraviata?_a=BAMClqXy0",
+    "title": "LaTraviata",
+    "description": ""
+  },
+  "portfolio_images/original/カモノハシの卵": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--_q_VDZky--/f_auto,q_auto/v1/portfolio_images/original/%E3%82%AB%E3%83%A2%E3%83%8E%E3%83%8F%E3%82%B7%E3%81%AE%E5%8D%B5?_a=BAMClqXy0",
+    "title": "カモノハシの卵",
+    "description": ""
+  },
+  "portfolio_images/original/ネコザメの卵": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--N9Y4BfM9--/f_auto,q_auto/v1/portfolio_images/original/%E3%83%8D%E3%82%B3%E3%82%B6%E3%83%A1%E3%81%AE%E5%8D%B5?_a=BAMClqXy0",
+    "title": "ネコザメの卵",
+    "description": ""
+  },
+  "portfolio_images/original/桜ねこ": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--nvGTLO9E--/f_auto,q_auto/v1/portfolio_images/original/%E6%A1%9C%E3%81%AD%E3%81%93?_a=BAMClqXy0",
+    "title": "桜ねこ",
+    "description": ""
+  },
+  "portfolio_images/original/海底撈月": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--Y38LmbnD--/f_auto,q_auto/v1/portfolio_images/original/%E6%B5%B7%E5%BA%95%E6%92%88%E6%9C%88?_a=BAMClqXy0",
+    "title": "海底撈月",
+    "description": ""
+  },
+  "portfolio_images/original/真っ赤なお鼻": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s---WinDHcf--/f_auto,q_auto/v1/portfolio_images/original/%E7%9C%9F%E3%81%A3%E8%B5%A4%E3%81%AA%E3%81%8A%E9%BC%BB?_a=BAMClqXy0",
+    "title": "真っ赤なお鼻",
+    "description": ""
+  },
+  "portfolio_images/original/饕餮行脚万圣节": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--SdixLwGj--/f_auto,q_auto/v1/portfolio_images/original/%E9%A5%95%E9%A4%AE%E8%A1%8C%E8%84%9A%E4%B8%87%E5%9C%A3%E8%8A%82?_a=BAMClqXy0",
+    "title": "饕餮行脚万圣节",
+    "description": ""
+  }
 }

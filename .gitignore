@@ -30,6 +30,7 @@ out/
 
 # Cloudinaryアップロード用のローカル画像一時保管場所
 images/
+figures/
 
 # Node
 node_modules/
