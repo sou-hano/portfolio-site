@@ -17,27 +17,27 @@ fetch('signed_urls/common.json')
         console.error("ロゴ画像の読み込みに失敗しました:", err);
     });
 
-// 関数：モーダルを開いて表示内容を更新
-function showModal(item) {
-  modal.style.display = "block";
-  modalImg.src = item.url;
-  modalTitle.textContent = item.title || "";
-  modalDesc.innerHTML = item.description || ""; //innerHTMLにして、.json内に記述した改行コード<br>を認識するようにする
-}
-
 // モーダル要素を取得
 const modal = document.getElementById("image-modal");
-const modalImg = document.getElementById("modal-image");
 const modalTitle = document.getElementById("modal-title");
 const modalDesc = document.getElementById("modal-description");
 const modalClose = document.querySelector(".modal-close");
+const modalPrev = document.getElementById("modal-prev");
+const modalNext = document.getElementById("modal-next");
+
+let currentIndex = 0;
+let touchStartX = 0;
+let targets = [];
+let data = {};
 
 // original.json を読み込んで画像を表示
 fetch('signed_urls/original.json')
     .then(res => res.json())
-    .then(data => {
+    .then(json => {
+        data = json; // グローバル変数に代入
+
         // 表示対象とする画像のpublic_id（拡張子なし）
-        const targets = [
+        targets = [
             "portfolio_images/original/DearSeraph",
             "portfolio_images/original/ネコザメの卵",
             "portfolio_images/original/饕餮行脚万圣节",
@@ -47,10 +47,9 @@ fetch('signed_urls/original.json')
         ];
 
         // 表示領域のDOM要素を取得
-        const container = document.getElementById('original-image-test');
-
+        const container = document.getElementById('original');
         if (!container) {
-            console.warn("original-image-test の表示エリアが見つかりませんでした");
+            console.warn("original の表示エリアが見つかりませんでした");
             return;
         }
 
@@ -65,15 +64,10 @@ fetch('signed_urls/original.json')
                 img.loading = "lazy"; // 必要に応じてlazy属性付与
 
                 img.addEventListener("click", () => {
-                    showModal(item);
+                    const index = targets.indexOf(id);
+                    showModal(index);
                 });
-                // スマホ用
-                /*
-                img.addEventListener("touchstart", e => {
-                    e.preventDefault();
-                    showModal(item);
-                }, { passive: false });
-                */
+
                 container.appendChild(img);
             }
             else {
@@ -84,6 +78,90 @@ fetch('signed_urls/original.json')
     .catch(err => {
         console.error("original画像の読み込みに失敗しました:", err);
     });
+
+// モーダルを表示し、画像＋テキスト切り替え
+function showModal(index, direction = "right") {
+    const id = targets[index];
+    const item = data[id];
+    if (!item) return;
+
+    const wrapper = document.querySelector(".flip-wrapper");
+    const frontImg = document.getElementById("modal-image-current");
+    const caption = document.getElementById("modal-caption");
+
+    // キャプション一時非表示
+    modal.style.display = "block"; //modal表示
+    caption.classList.remove("visible");
+
+    // 初期化
+    wrapper.style.transition = 'none';
+    wrapper.style.transform = 'rotateY(0deg)';
+    frontImg.style.transition = 'none';
+    frontImg.style.transform = 'scaleX(1)';
+    void wrapper.offsetWidth; // リフローを強制して再描画（transition再適用のため）
+
+    // 回転スタート：元画像で90度まで（半分だけ）
+    wrapper.style.transition = 'transform 0.4s ease';
+    wrapper.style.transform = direction === "right" ? "rotateY(90deg)" : "rotateY(-90deg)";
+
+    // 90度になったら新画像に切り替え、180度まで回転
+    setTimeout(() => {
+        frontImg.src = item.url;
+        modalTitle.textContent = item.title || "";
+        modalDesc.innerHTML = item.description || ""; // innerHTMLにして.json内の改行<br>を認識するようにする
+
+        // アニメーション中だけ反転を適用
+        frontImg.style.transition = 'transform 0.4s ease';
+        frontImg.style.transform = 'scaleX(-1)';
+
+        // 180度まで継続回転
+        wrapper.style.transition = 'transform 0.4s ease';
+        wrapper.style.transform = direction === "right" ? "rotateY(180deg)" : "rotateY(-180deg)";
+    }, 400);
+
+    // アニメーションを待ってから表画像を更新し、wrapperをリセット
+    setTimeout(() => {
+        wrapper.style.transition = 'none';
+        wrapper.style.transform = "rotateY(0deg)";
+        // 画像反転リセット 
+        frontImg.style.transition = 'none';
+        frontImg.style.transform = 'scaleX(1)';
+
+        caption.classList.add("visible");
+        currentIndex = index;
+    }, 800);
+}
+
+// < >ボタンで画像切り替え、最初と末尾はループ
+modalPrev.addEventListener("click", () => {
+    const prevIndex = (currentIndex - 1 + targets.length) % targets.length;
+    showModal(prevIndex, "left");
+});
+
+modalNext.addEventListener("click", () => {
+    const nextIndex = (currentIndex + 1) % targets.length;
+    showModal(nextIndex, "right");
+});
+
+// モバイル向けスワイプ切り替え操作
+modal.addEventListener("touchstart", e => {
+    touchStartX = e.changedTouches[0].screenX;
+});
+
+modal.addEventListener("touchend", e => {
+    const touchEndX = e.changedTouches[0].screenX;
+    const deltaX = touchEndX - touchStartX;
+    if (Math.abs(deltaX) > 50) {
+        if (deltaX > 0) {
+            const prevIndex = (currentIndex - 1 + targets.length) % targets.length;
+            showModal(prevIndex, "left");
+        } else {
+            const nextIndex = (currentIndex + 1) % targets.length;
+            showModal(nextIndex, "right");
+        }
+    }
+});
+
 
 // モーダルを閉じる処理
 modalClose.onclick = () => {

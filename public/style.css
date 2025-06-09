@@ -1,7 +1,3 @@
-/* ------------------------------
-   全体の初期設定（背景・文字・余白リセット）
---------------------------------- */
-
 body {
     margin: 0;
     padding: 0;
@@ -156,7 +152,7 @@ main {
     z-index: 2000;
     background-color: rgba(0, 0, 0, 0.85);
     /* スクロール範囲指定は .modal-body 側で行う */
-    overflow: hidden;
+    overflow: auto;
 }
 
 /* スクロール範囲を管理、画像や説明が長大になってもスクロールできるようにする */
@@ -164,31 +160,58 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-height: 100vh;
-    /* スクロール範囲を限定 */
+    justify-content: flex-start;
+    min-height: 100vh;
+    /* 高さは中身に応じて可変にする */
+    height: auto;
     overflow-y: auto;
     padding: 60px 1em 2em;
     box-sizing: border-box;
 }
 
-/* 画像 */
-.modal-content {
-    display: block;
-    width: auto;
-    max-width: 90%;
+/* ラップ用の3D空間 */
+.flip-wrapper {
+    position: relative;
+    width: 80vw;
+    /* 内容に応じて可変に */
     height: auto;
-    /* 画像の最大高さを画面の～%までに制限 */
-    max-height: 200vh;
-    margin-bottom: 1em;
+    /* 高さは最大160vhに制限 */
+    max-height: none;
+    /* 内容がなくても空間を確保 */
+    min-height: 40vh;
+    perspective: 2000px;
+    margin: auto;
+    transform-style: preserve-3d;
+    transition: transform 0.8s ease;
+    /* はみ出し防止 */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* モーダル画像 */
+.modal-content {
+    max-height: 100%;
+    width: 100%;
     object-fit: contain;
 }
 
-/* モーダルキャプション */
+
+/* モーダルキャプション（初期非表示） */
 #modal-caption {
+    /* 画像との余白 */
+    margin-top: 1em;
     color: #fff;
     text-align: center;
-    padding: 0 1em;
-    white-space: normal;
+    opacity: 0;
+    transition: opacity 0.4s ease 0.2s;
+    z-index: 1;
+}
+
+/* アニメーション中のキャプション一時的に非表示用 */
+#modal-caption.visible {
+    opacity: 1;
 }
 
 #modal-caption h3 {
@@ -203,14 +226,79 @@ main {
     white-space: normal;
 }
 
+/* モーダルの左右切り替えボタン */
+.modal-nav {
+    position: fixed;
+    top: 50%;
+    font-size: 3em;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    transform: translateY(-50%);
+    /* 画像より前に表示 */
+    z-index: 3000;
+    padding: 0 1em;
+}
+
+.modal-nav.left {
+    left: -30px;
+}
+
+.modal-nav.right {
+    right: -30px;
+}
+
+/* 現在の画像（表面） */
+.flip-front {
+    transform: rotateY(0deg);
+    z-index: 2;
+}
+
+/* 次の画像（裏面） */
+.flip-back {
+    transform: rotateY(180deg);
+    /* ← 常に裏に待機 */
+    z-index: 1;
+}
+
+
+/* スライド効果：fade + slide */
+#modal-image {
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    opacity: 1;
+}
+
+/* スライドアウト（現在の画像） */
+.from-right {
+    transform: translateX(150%);
+    opacity: 0;
+}
+
+.from-left {
+    transform: translateX(-150%);
+    opacity: 0;
+}
+
+/* スライドイン */
+.slide-in {
+    transform: translateX(0%);
+    opacity: 1;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+
 /* モーダルの閉じるボタン */
 .modal-close {
-    position: absolute;
-    top: 20px;
+    position: fixed;
+    top: 30px;
     right: 35px;
     color: #fff;
-    font-size: 2em;
+    font-size: 2.5em;
     cursor: pointer;
+    /* 他要素より上に */
+    z-index: 3000;
 }
 
 /* ------------------------------

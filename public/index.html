@@ -59,7 +59,7 @@
     <section id="main-page" class="page active-page">
       <section class="genre-section">
         <h2>Originals</h2>
-        <div class="image-container" id="original-image-test"></div>
+        <div class="image-container" id="original"></div>
       </section>
 
       <section id="fanart" class="genre-section">
@@ -118,9 +118,16 @@
   <!-- 画像クリック時に表示されるモーダル構造（オーバーレイ表示）、Bodyの最後に書く、ページ全体に1つでOK -->
   <div id="image-modal" class="modal">
     <span class="modal-close">&times;</span>
+    <!-- 左右切り替えボタン -->
+    <button class="modal-nav left" id="modal-prev">&#10094;</button>
+    <button class="modal-nav right" id="modal-next">&#10095;</button>
 
     <div class="modal-body">
-      <img class="modal-content" id="modal-image">
+      <div class="flip-wrapper">
+        <img id="modal-image-current" class="modal-content flip-front">
+        <!-- 切り替え用の2枚目の画像 -->
+        <img id="modal-image-next" class="modal-content flip-back">
+      </div>
       <div id="modal-caption">
         <h3 id="modal-title"></h3>
         <p id="modal-description"></p>
