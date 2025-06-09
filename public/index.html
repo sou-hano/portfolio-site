@@ -32,9 +32,9 @@
     <!-- サブナビゲーション：各ページごとに表示切替される -->
     <nav class="sub-nav" id="sub-nav-main">
       <ul>
-        <li><a href="#original">オリジナル</a></li>
-        <li><a href="#fanart">二次創作</a></li>
-        <li><a href="#collab">合作</a></li>
+        <li><a href="#original-anchor">オリジナル</a></li>
+        <li><a href="#collab-anchor">合作</a></li>
+        <li><a href="#fanart-anchor">ファンアート</a></li>
       </ul>
     </nav>
     <!--
@@ -57,20 +57,36 @@
   <main>
     <!-- メインページ：オリジナル・二次創作・合作 -->
     <section id="main-page" class="page active-page">
-      <section class="genre-section">
-        <h2>Originals</h2>
-        <div class="image-container" id="original"></div>
+      <!-- ジャンプ先指定用ID -->
+      <section class="genre-section" id="original-anchor">
+        <h2>オリジナル</h2>
+        <div class="image-container A4-container" id="original"></div>
       </section>
 
-      <section id="fanart" class="genre-section">
-        <h2>二次創作イラスト</h2>
-        <div class="image-container" data-genre="fanart"></div>
+      <section class="genre-section" id="collab-anchor">
+        <h2>合作</h2>
+        <div class="image-container A4-container" id="collab"></div>
       </section>
 
-      <section id="collab" class="genre-section">
-        <h2>合作イラスト</h2>
-        <div class="image-container" data-genre="collab"></div>
+      <section class="genre-section" id="fanart-anchor">
+        <h2>ファンアート</h2>
+        <section class="fanart-subsection pokemon-section">
+          <h3>ポケモン100日チャレンジ! (計200枚)</h3>
+          <div class="image-overlay" id="pokemon-overlay"></div>
+        </section>
+
+        <section class="fanart-subsection kingsraid-section">
+          <h3>King's Raid</h3>
+          <div class="image-container A4-container" id="kingsraid"></div>
+        </section>
+
+        <section class="fanart-subsection otherfanart-section">
+          <h3>Others</h3>
+          <div class="image-container A4-container" id="otherfanart"></div>
+        </section>
       </section>
+
+
     </section>
 
     <!-- 技術スタックページ -->
@@ -102,7 +118,7 @@
     <nav class="footer-nav">
       <ul>
         <li><a href="#original">オリジナル</a></li>
-        <li><a href="#fanart">二次創作</a></li>
+        <li><a href="#fanart">ファンアート</a></li>
         <li><a href="#collab">合作</a></li>
         <!--
         <li><a href="#work1">製作物1</a></li>
@@ -116,19 +132,17 @@
 
 
   <!-- 画像クリック時に表示されるモーダル構造（オーバーレイ表示）、Bodyの最後に書く、ページ全体に1つでOK -->
-  <div id="image-modal" class="modal">
-    <span class="modal-close">&times;</span>
+  <div id="image-modal" class="modal z-modal">
+    <span class="modal-close z-topmost">&times;</span>
     <!-- 左右切り替えボタン -->
-    <button class="modal-nav left" id="modal-prev">&#10094;</button>
-    <button class="modal-nav right" id="modal-next">&#10095;</button>
+    <button class="modal-nav left z-topmost" id="modal-prev">&#10094;</button>
+    <button class="modal-nav right z-topmost" id="modal-next">&#10095;</button>
 
     <div class="modal-body">
       <div class="flip-wrapper">
         <img id="modal-image-current" class="modal-content flip-front">
-        <!-- 切り替え用の2枚目の画像 -->
-        <img id="modal-image-next" class="modal-content flip-back">
       </div>
-      <div id="modal-caption">
+      <div id="modal-caption" class="z-caption">
         <h3 id="modal-title"></h3>
         <p id="modal-description"></p>
       </div>
@@ -138,6 +152,14 @@
   <!-- メインの制御用JavaScriptファイルを読み込み -->
   <!-- 中でモーダル構造を読み込むためモーダル構造構造より後に書く -->
   <script src="main.js"></script>
+
+  <!-- ポケモン背景専用スライダー：ページ全体に配置 -->
+  <div class="pokemon-background-global">
+    <!-- この子要素に画像を配置 -->
+    <div id="pokemon-background-grid"></div>
+  </div>
+  </div>
 </body>
+
 
 </html>

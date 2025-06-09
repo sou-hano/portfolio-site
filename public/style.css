@@ -17,8 +17,8 @@ header#main-header {
     position: fixed;
     top: 0;
     width: 100%;
-    background-color: #fff;
-    border-bottom: 1px solid #ccc;
+    background-color: #fffffff0;
+    border-bottom: 1px solid #cccccc;
     /* 他要素より上に重ねる */
     z-index: 1000;
 }
@@ -57,7 +57,7 @@ header#main-header {
 /* sub-nav に適用 */
 .sub-nav {
     padding: 0.5em 1em;
-    background-color: #f3f3f3;
+    background-color: #e4e4e488;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
 }
@@ -107,6 +107,10 @@ main {
 --------------------------------- */
 /* genre-section に適用 */
 .genre-section {
+    position: relative;
+    z-index: 1;
+    scroll-margin-top: 140px;
+    /* ヘッダーの高さ分ずらしてジャンプ */
     padding: 2em 0;
     border-bottom: 1px solid #eee;
 }
@@ -127,32 +131,30 @@ main {
     flex-wrap: wrap;
     gap: 1em;
     justify-content: center;
+    position: relative;
+    z-index: 1;
 }
 
 /* image-container内 <img> に適用 */
 .image-container img {
     max-width: 500px;
-    /* 親幅にフィット */
-    width: 100%;
+    /* 幅500px以下（モバイル端末など）では親幅の90%に */
+    width: 90%;
     /* アスペクト比維持 */
     height: auto;
     /* 角丸にする */
-    border-radius: 6px;
+    border-radius: 8px;
     /* 軽い影で浮き上がり効果 */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-
-/* モーダル背景 */
-.modal {
-    display: none;
-    position: fixed;
-    /* top: 0; bottom: 0; left: 0; right: 0 */
-    inset: 0;
-    z-index: 2000;
-    background-color: rgba(0, 0, 0, 0.85);
-    /* スクロール範囲指定は .modal-body 側で行う */
-    overflow: auto;
+.A4-container img {
+    aspect-ratio: 210 / 297;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
 }
 
 /* スクロール範囲を管理、画像や説明が長大になってもスクロールできるようにする */
@@ -182,12 +184,17 @@ main {
     perspective: 2000px;
     margin: auto;
     transform-style: preserve-3d;
-    transition: transform 0.8s ease;
     /* はみ出し防止 */
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* 現在の画像（表面） */
+.flip-front {
+    transform: rotateY(0deg);
+    z-index: 2;
 }
 
 /* モーダル画像 */
@@ -197,6 +204,16 @@ main {
     object-fit: contain;
 }
 
+/* モーダル背景 */
+.modal {
+    display: none;
+    position: fixed;
+    /* top: 0; bottom: 0; left: 0; right: 0 */
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    /* スクロール範囲指定は .modal-body 側で行う */
+    overflow: auto;
+}
 
 /* モーダルキャプション（初期非表示） */
 #modal-caption {
@@ -206,7 +223,6 @@ main {
     text-align: center;
     opacity: 0;
     transition: opacity 0.4s ease 0.2s;
-    z-index: 1;
 }
 
 /* アニメーション中のキャプション一時的に非表示用 */
@@ -237,8 +253,6 @@ main {
     cursor: pointer;
     user-select: none;
     transform: translateY(-50%);
-    /* 画像より前に表示 */
-    z-index: 3000;
     padding: 0 1em;
 }
 
@@ -248,26 +262,6 @@ main {
 
 .modal-nav.right {
     right: -30px;
-}
-
-/* 現在の画像（表面） */
-.flip-front {
-    transform: rotateY(0deg);
-    z-index: 2;
-}
-
-/* 次の画像（裏面） */
-.flip-back {
-    transform: rotateY(180deg);
-    /* ← 常に裏に待機 */
-    z-index: 1;
-}
-
-
-/* スライド効果：fade + slide */
-#modal-image {
-    transition: transform 0.5s ease, opacity 0.5s ease;
-    opacity: 1;
 }
 
 /* スライドアウト（現在の画像） */
@@ -297,8 +291,126 @@ main {
     color: #fff;
     font-size: 2.5em;
     cursor: pointer;
+}
+
+@keyframes scrollBackground {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.pokemon-background-global {
+    display: flex;
+    /* 子要素（背景grid）を下に寄せる */
+    align-items: flex-end;
+    justify-content: flex-start;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /* 確実に背面へ */
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+.pokemon-background-global.visible {
+    opacity: 1;
+}
+
+#pokemon-background-grid {
+    display: flex;
+    width: max-content;
+    /* tile-group を下に揃える（垂直整列） */
+    align-items: end;
+    transform: translateX(0);
+    transition: transform 50s linear;
+    /* 初期値として50秒、JS側で上書き */
+}
+
+#pokemon-background-grid .tile-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 1fr);
+    grid-auto-rows: min-content;
+    gap: 2px;
+}
+
+
+.tile-group {
+    display: grid;
+    /*  140px × 20列 = 2800px */
+    grid-template-columns: repeat(20, 140px);
+    grid-auto-rows: 140px;
+    gap: 8px;
+    /* padding を 0 にして余白を除く */
+    padding: 0;
+    /* グループ間余白も除去 */
+    margin: 1px;
+}
+
+.tile-group img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 6px;
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+/* ラッパー全体を滑らかに左右に移動させる */
+@keyframes scrollBackground {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+
+    /* 50%でちょうどループ */
+}
+
+/* 前景イラスト */
+#pokemon-overlay {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    justify-content: center;
+    padding: 2em 1em;
+}
+
+#pokemon-overlay img {
+    /* 丸くする */
+    border-radius: 50%;
+    /* 正円を維持 */
+    aspect-ratio: 1 / 1;
+    /* 中央に合わせて切り抜き */
+    object-fit: cover;
+    width: 170px;
+    height: 170px;
+}
+
+/* z-index（表示位置） */
+.z-topmost {
     /* 他要素より上に */
     z-index: 3000;
+}
+
+.z-modal {
+    z-index: 2000;
+}
+
+.z-caption {
+    z-index: 1;
 }
 
 /* ------------------------------
