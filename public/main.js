@@ -398,25 +398,43 @@ fetch('signed_urls/fanart.json')
         console.error("fanart画像の読み込みに失敗しました:", err);
     });
 
+// モバイル端末の場合カーソル処理切り替え
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-// カーソル本体を作成
+// カーソル本体（PCのみ表示）
 const cursorRing = document.createElement('div');
 cursorRing.classList.add('cursor-ring');
-document.body.appendChild(cursorRing);
+if (!isTouchDevice) {
+    document.body.appendChild(cursorRing);
+}
 
-// カーソルの位置を記録して更新
+// カーソル位置追従
 let cursorX = window.innerWidth / 2;
 let cursorY = window.innerHeight / 2;
 
 document.addEventListener('mousemove', e => {
     cursorX = e.clientX;
     cursorY = e.clientY;
-    cursorRing.style.left = `${cursorX}px`;
-    cursorRing.style.top = `${cursorY}px`;
+    if (!isTouchDevice) {
+        cursorRing.style.left = `${cursorX}px`;
+        cursorRing.style.top = `${cursorY}px`;
+    }
 });
 
-// クリック波紋エフェクト
+document.addEventListener('touchstart', e => {
+    cursorX = e.touches[0].clientX;
+    cursorY = e.touches[0].clientY;
+});
+
+// 波紋エフェクト
 document.addEventListener('mousedown', () => {
+    if (!isTouchDevice) showRipples();
+});
+document.addEventListener('touchstart', () => {
+    showRipples();
+});
+
+function showRipples() {
     for (let i = 0; i < 2; i++) {
         const ripple = document.createElement('div');
         ripple.classList.add('ripple');
@@ -426,10 +444,23 @@ document.addEventListener('mousedown', () => {
         document.body.appendChild(ripple);
         ripple.addEventListener('animationend', () => ripple.remove());
     }
-});
+}
+
+// 三角パーティクル表示（PC：常時、モバイル：タップ中のみ）
+let allowParticles = !isTouchDevice;
+if (isTouchDevice) {
+    document.addEventListener('touchstart', () => {
+        allowParticles = true;
+        setTimeout(() => {
+            allowParticles = false;
+        }, 300); // タップ直後0.3秒だけ表示
+    });
+}
 
 // 三角パーティクルをランダム方向に散らす
 setInterval(() => {
+    if (!allowParticles) return;
+
     const particle = document.createElement('div');
     particle.classList.add('particle');
     const angle = Math.random() * 360;
@@ -441,6 +472,5 @@ setInterval(() => {
     particle.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 360}deg)`;
 
     document.body.appendChild(particle);
-
     particle.addEventListener('animationend', () => particle.remove());
 }, 150); // 100msごとでパーティクルを発生
