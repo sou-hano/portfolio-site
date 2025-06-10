@@ -65,7 +65,7 @@ fetch('signed_urls/original.json')
 
                 img.addEventListener("click", () => {
                     const index = targets.indexOf(id);
-                    showModal(index);
+                    showModal(index, "right", targets, data);
                 });
 
                 container.appendChild(img);
@@ -104,10 +104,8 @@ fetch('signed_urls/collaboration.json')
                 img.loading = "lazy";
 
                 img.addEventListener("click", () => {
-                    targets = collabTargets;
-                    data = json;
-                    const index = targets.indexOf(id);
-                    showModal(index);
+                    const index = collabTargets.indexOf(id);
+                    showModal(index, "right", collabTargets, json);
                 });
 
                 collabContainer.appendChild(img);
@@ -122,9 +120,9 @@ fetch('signed_urls/collaboration.json')
     });
 
 // モーダルを表示し、画像＋テキスト切り替え
-function showModal(index, direction = "right") {
-    const id = targets[index];
-    const item = data[id];
+function showModal(index, direction = "right", activeTargets = targets, activeData = data) {
+    const id = activeTargets[index];
+    const item = activeData[id];
     if (!item) return;
 
     const wrapper = document.querySelector(".flip-wrapper");
@@ -215,28 +213,113 @@ modal.onclick = (event) => {
     }
 };
 
+
+// タイルグループ生成関数
+function createTileGroup(images) {
+    const tileGroup = document.createElement('div');
+    tileGroup.className = 'tile-group';
+
+    images.forEach(([id, item]) => {
+        const img = document.createElement('img');
+        img.src = item.url;
+        img.alt = item.title || "";
+        tileGroup.appendChild(img);
+    });
+    return tileGroup;
+}
+
+const scrollDuration = 50000; // 50,000秒ごとにループ
 // ポケモン背景表示判定
 document.addEventListener('DOMContentLoaded', () => {
-  const background = document.querySelector('.pokemon-background-global');
-  const pokemonSection = document.querySelector('.pokemon-section'); // classで取得
+    const background = document.querySelector('.pokemon-background-global');
+    const pokemonSection = document.querySelector('.pokemon-section'); // classで取得
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        background.classList.add('visible');
-      } else {
-        background.classList.remove('visible');
-      }
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                background.classList.add('visible');
+
+                // 表示領域ならアニメーション再開
+                if (!animationTimer) {
+                    animationTimer = setInterval(() => {
+                        shiftAndLoop(scrollDuration);
+                    }, scrollDuration);
+                }
+            } else {
+                background.classList.remove('visible');
+
+                // アニメーション停止
+                if (animationTimer) {
+                    clearInterval(animationTimer);
+                    animationTimer = null;
+                }
+            }
+        });
+    }, {
+        root: null,
+        threshold: 0.2
     });
-  }, {
-    root: null,
-    threshold: 0.3  // ~%以上表示されたら可視とみなす
-  });
 
-  if (pokemonSection) {
-    observer.observe(pokemonSection);
-  }
+    if (pokemonSection) {
+        observer.observe(pokemonSection);
+    }
 });
+
+const groupSize = 120;
+let bgIndex = 0;
+let backgroundGrid;
+let backgroundImages = [];
+let isBackgroundInitialized = false;
+let animationTimer = null;
+
+// 初回のみ背景画像の初期化処理
+const initPokemonBackground = () => {
+    if (isBackgroundInitialized) return;
+    isBackgroundInitialized = true;
+
+    backgroundGrid = document.getElementById('pokemon-background-grid');
+
+    // 背景画像初期2グループ生成
+    backgroundGrid.appendChild(createTileGroup(getNextImageSlice()));
+    backgroundGrid.appendChild(createTileGroup(getNextImageSlice()));
+
+    // 初回スクロール開始
+    backgroundGrid.style.transition = `transform ${scrollDuration}ms linear`;
+    backgroundGrid.style.transform = 'translateX(-50%)';
+
+    // ループアニメーション
+    animationTimer = setInterval(() => {
+        shiftAndLoop(scrollDuration);
+    }, scrollDuration);
+};
+
+// 次の画像グループ取得（groupSize枚）
+function getNextImageSlice() {
+    const slice = backgroundImages.slice(bgIndex, bgIndex + groupSize);
+    bgIndex = (bgIndex + groupSize) % backgroundImages.length;
+    return slice.length < groupSize
+        ? slice.concat(backgroundImages.slice(0, groupSize - slice.length))
+        : slice;
+}
+
+function shiftAndLoop(duration) {
+    // アニメーション後に最初の tile-group を消して、最後に追加して滑らかにつなぐ
+    const firstGroup = backgroundGrid.firstElementChild;
+    if (!firstGroup) return;
+
+    const newGroup = createTileGroup(getNextImageSlice());
+
+    backgroundGrid.appendChild(newGroup);
+    backgroundGrid.removeChild(firstGroup);
+
+    // リセットトリガー用にアニメーションを強制再適用（CSS以外でスクロールするなら不要）
+    backgroundGrid.style.transition = 'none';
+    backgroundGrid.style.transform = 'translateX(0)';
+    void backgroundGrid.offsetWidth;
+
+    backgroundGrid.style.transition = `transform ${duration}ms linear`;
+    backgroundGrid.style.transform = 'translateX(-50%)';
+}
 
 // 二次創作
 fetch('signed_urls/fanart.json')
@@ -245,70 +328,10 @@ fetch('signed_urls/fanart.json')
         const allEntries = Object.entries(json);
 
         // 背景画像（200枚）
-        const backgroundImages = allEntries.filter(([id]) =>
+        backgroundImages = allEntries.filter(([id]) =>
             id.includes('/fanart/Pokemon_background/')
         ).slice(0, 200);
 
-        const backgroundGrid = document.getElementById('pokemon-background-grid');
-
-        let bgIndex = 0;
-        const scrollDuration = 50000; // 50,000秒
-
-        // タイルグループ生成関数
-        function createTileGroup(images) {
-            const tileGroup = document.createElement('div');
-            tileGroup.className = 'tile-group';
-
-            images.forEach(([id, item]) => {
-                const img = document.createElement('img');
-                img.src = item.url;
-                img.alt = item.title || "";
-                img.loading = "lazy";
-                tileGroup.appendChild(img);
-            });
-
-            return tileGroup;
-        }
-
-        // 次の画像グループ取得（120枚）
-        const groupSize = 120;
-        function getNextImageSlice() {
-            const slice = backgroundImages.slice(bgIndex, bgIndex + groupSize);
-            bgIndex = (bgIndex + groupSize) % backgroundImages.length;
-            return slice.length < groupSize
-                ? slice.concat(backgroundImages.slice(0, groupSize - slice.length))
-                : slice;
-        }
-
-        // 初期2グループ配置
-        backgroundGrid.appendChild(createTileGroup(getNextImageSlice()));
-        backgroundGrid.appendChild(createTileGroup(getNextImageSlice()));
-
-        function shiftAndLoop(duration) {
-            // アニメーション後に最初の tile-group を消して、最後に追加して滑らかにつなぐ
-            const firstGroup = backgroundGrid.firstElementChild;
-            const newGroup = createTileGroup(getNextImageSlice());
-
-            backgroundGrid.appendChild(newGroup);
-            backgroundGrid.removeChild(firstGroup);
-
-            // リセットトリガー用にアニメーションを強制再適用（CSS以外でスクロールするなら不要）
-            backgroundGrid.style.transition = 'none';
-            backgroundGrid.style.transform = 'translateX(0)';
-            void backgroundGrid.offsetWidth;
-
-            backgroundGrid.style.transition = `transform ${duration}ms linear`;
-            backgroundGrid.style.transform = 'translateX(-50%)';
-        }
-
-        // 初回スクロール開始
-        backgroundGrid.style.transition = `transform ${scrollDuration}ms linear`;
-        backgroundGrid.style.transform = 'translateX(-50%)';
-
-        // ループでスクロールと更新を続ける
-        setInterval(() => {
-            shiftAndLoop(scrollDuration);
-        }, scrollDuration);
 
         // 以下は前景画像の処理（Pokemon, King'sRaid, その他）
         const overlay = document.getElementById('pokemon-overlay');
@@ -342,10 +365,8 @@ fetch('signed_urls/fanart.json')
                 img.loading = "lazy";
 
                 img.addEventListener("click", () => {
-                    targets = groupTargets;
-                    data = json;
-                    currentIndex = targets.indexOf(id);
-                    showModal(currentIndex);
+                    const index = groupTargets.indexOf(id);
+                    showModal(index, "right", groupTargets, json);
                 });
 
                 container.appendChild(img);
@@ -355,6 +376,10 @@ fetch('signed_urls/fanart.json')
         displayGroup(pokemonImages, overlay);
         displayGroup(kingsraid, kingsContainer);
         displayGroup(others, otherContainer);
+
+        // 背景画像の初期化（すでに backgroundImages は設定済み）
+        initPokemonBackground();
+        document.querySelector('.pokemon-background-global').classList.add('visible');
     })
     .catch(err => {
         console.error("fanart画像の読み込みに失敗しました:", err);

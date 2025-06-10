@@ -6,9 +6,9 @@ const path = require('path');                   // 出力ファイルのパス�
 
 // Cloudinaryアカウント情報
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 // コマンドラインから署名を付けるCloudinaryのベースフォルダ名を取得
@@ -88,14 +88,25 @@ const getResourcesInFolder = async (folder, nextCursor = null, results = []) => 
             const genre = pathParts[0]; // サブフォルダ名をジャンル名に
             const fileName = pathParts.slice(-1)[0]; // ファイル名
 
+
+            // transformation 条件を画像パスに応じて分岐、背景専用画像のサイズを制限
+            const isPokemonBackground = publicId.includes('/fanart/Pokemon_background/');
+
+            const transformation = isPokemonBackground
+                ? [
+                    { width: 140, height: 140, crop: "fill" },
+                    { quality: "auto:low", fetch_format: "auto" }
+                ]
+                : [
+                    { quality: "auto", fetch_format: "auto" }
+                ];
+
             // 署名付きURL生成 (非同期)
             const signedUrl = cloudinary.url(publicId, {
                 type: 'authenticated',
                 sign_url: true,
                 expires_at: expiresAt,
-                transformation: [
-                    { quality: "auto", fetch_format: "auto" } // 表示環境に応じて画質・拡張子を最適化
-                ]
+                transformation
             });
 
             const existing = genreUrlMap[genre]?.[publicId] || {};
