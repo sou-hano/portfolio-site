@@ -59,6 +59,7 @@ fetch('signed_urls/original.json')
 
             if (item && item.url) {
                 const img = document.createElement('img');
+                img.classList.add('hover-zoom');
                 img.src = item.url;
                 img.alt = item.title || id.split('/').pop(); // ファイル名だけaltに設定
                 img.loading = "lazy"; // 必要に応じてlazy属性付与
@@ -99,6 +100,7 @@ fetch('signed_urls/collaboration.json')
 
             if (item && item.url) {
                 const img = document.createElement('img');
+                img.classList.add('hover-zoom');
                 img.src = item.url;
                 img.alt = item.title || id.split('/').pop();
                 img.loading = "lazy";
@@ -119,10 +121,19 @@ fetch('signed_urls/collaboration.json')
         console.error("collab画像の読み込みに失敗しました:", err);
     });
 
+// モーダル用現在のセクション保持変数
+let currentTargets = [];
+let currentData = {};
+
 // モーダルを表示し、画像＋テキスト切り替え
 function showModal(index, direction = "right", activeTargets = targets, activeData = data) {
+    // 現在の表示対象を記録
+    currentTargets = activeTargets;
+    currentData = activeData;
+
     const id = activeTargets[index];
     const item = activeData[id];
+
     if (!item) return;
 
     const wrapper = document.querySelector(".flip-wrapper");
@@ -174,13 +185,13 @@ function showModal(index, direction = "right", activeTargets = targets, activeDa
 
 // < >ボタンで画像切り替え、最初と末尾はループ
 modalPrev.addEventListener("click", () => {
-    const prevIndex = (currentIndex - 1 + targets.length) % targets.length;
-    showModal(prevIndex, "left");
+    const prevIndex = (currentIndex - 1 + currentTargets.length) % currentTargets.length;
+    showModal(prevIndex, "left", currentTargets, currentData);
 });
 
 modalNext.addEventListener("click", () => {
-    const nextIndex = (currentIndex + 1) % targets.length;
-    showModal(nextIndex, "right");
+    const nextIndex = (currentIndex + 1) % currentTargets.length;
+    showModal(nextIndex, "right", currentTargets, currentData);
 });
 
 // モバイル向けスワイプ切り替え操作
@@ -193,11 +204,11 @@ modal.addEventListener("touchend", e => {
     const deltaX = touchEndX - touchStartX;
     if (Math.abs(deltaX) > 50) {
         if (deltaX > 0) {
-            const prevIndex = (currentIndex - 1 + targets.length) % targets.length;
-            showModal(prevIndex, "left");
+            const prevIndex = (currentIndex - 1 + currentTargets.length) % currentTargets.length;
+            showModal(prevIndex, "left", currentTargets, currentData);
         } else {
-            const nextIndex = (currentIndex + 1) % targets.length;
-            showModal(nextIndex, "right");
+            const nextIndex = (currentIndex + 1) % currentTargets.length;
+            showModal(nextIndex, "right", currentTargets, currentData);
         }
     }
 });
@@ -221,6 +232,7 @@ function createTileGroup(images) {
 
     images.forEach(([id, item]) => {
         const img = document.createElement('img');
+        img.classList.add('hover-zoom');
         img.src = item.url;
         img.alt = item.title || "";
         tileGroup.appendChild(img);
@@ -360,6 +372,7 @@ fetch('signed_urls/fanart.json')
             const groupTargets = entries.map(([id]) => id);
             entries.forEach(([id, item]) => {
                 const img = document.createElement('img');
+                img.classList.add('hover-zoom');
                 img.src = item.url;
                 img.alt = item.title || id.split('/').pop();
                 img.loading = "lazy";
@@ -384,3 +397,50 @@ fetch('signed_urls/fanart.json')
     .catch(err => {
         console.error("fanart画像の読み込みに失敗しました:", err);
     });
+
+
+// カーソル本体を作成
+const cursorRing = document.createElement('div');
+cursorRing.classList.add('cursor-ring');
+document.body.appendChild(cursorRing);
+
+// カーソルの位置を記録して更新
+let cursorX = window.innerWidth / 2;
+let cursorY = window.innerHeight / 2;
+
+document.addEventListener('mousemove', e => {
+    cursorX = e.clientX;
+    cursorY = e.clientY;
+    cursorRing.style.left = `${cursorX}px`;
+    cursorRing.style.top = `${cursorY}px`;
+});
+
+// クリック波紋エフェクト
+document.addEventListener('mousedown', () => {
+    for (let i = 0; i < 2; i++) {
+        const ripple = document.createElement('div');
+        ripple.classList.add('ripple');
+        ripple.style.left = `${cursorX}px`;
+        ripple.style.top = `${cursorY}px`;
+        ripple.style.animationDelay = `${i * 0.2}s`;
+        document.body.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+    }
+});
+
+// 三角パーティクルをランダム方向に散らす
+setInterval(() => {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const angle = Math.random() * 360;
+    const offsetX = Math.cos(angle) * 15;
+    const offsetY = Math.sin(angle) * 15;
+
+    particle.style.left = `${cursorX + offsetX}px`;
+    particle.style.top = `${cursorY + offsetY}px`;
+    particle.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 360}deg)`;
+
+    document.body.appendChild(particle);
+
+    particle.addEventListener('animationend', () => particle.remove());
+}, 150); // 100msごとでパーティクルを発生

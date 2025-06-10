@@ -79,6 +79,6 @@ uploadedFiles.forEach(filePath => {
       console.log(`アップロード成功: ${result.public_id}`);
     })
     .catch(error => {
-      console.error(`アップロード失敗 (${relativePublicId}):`, error.message);
+      console.error(`アップロード失敗 (${fileName}):`, error.message);
     });
 });
