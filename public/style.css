@@ -361,14 +361,15 @@ img.hover-zoom:hover {
     height: 100vh;
     /* 確実に背面へ */
     z-index: -1;
-    pointer-events: none;
     overflow: hidden;
     opacity: 0;
-    transition: opacity 0.8s ease;
+    pointer-events: none;
+    transition: opacity 1s ease;
 }
 
 .pokemon-background-global.visible {
     opacity: 1;
+    pointer-events: auto;
 }
 
 #pokemon-background-grid {
@@ -489,6 +490,15 @@ footer {
     color: #666;
     font-size: 0.9em;
 }
+
+
+body:not(.pokemon-ready) .pokemon-background-global {
+  display: none;
+}
+body.pokemon-ready .pokemon-background-global {
+  display: block;
+}
+
 
 
 /* カスタムカーソル */
