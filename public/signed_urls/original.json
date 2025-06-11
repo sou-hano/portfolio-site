@@ -43,5 +43,15 @@
     "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--SdixLwGj--/f_auto,q_auto/v1/portfolio_images/original/%E9%A5%95%E9%A4%AE%E8%A1%8C%E8%84%9A%E4%B8%87%E5%9C%A3%E8%8A%82?_a=BAMClqXy0",
     "title": "饕餮行脚万圣节",
     "description": "中国のハロウィンがテーマ<br>中国の怪異、キョンシーと饕餮が練り歩く夜をイメージ"
+  },
+  "portfolio_images/original/sharehappiness": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--pYK0aE48--/f_auto,q_auto/v1/portfolio_images/original/sharehappiness?_a=BAMClqXy0",
+    "title": "sharehappiness",
+    "description": ""
+  },
+  "portfolio_images/original/Valentine": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--2AUmRlUs--/f_auto,q_auto/v1/portfolio_images/original/Valentine?_a=BAMClqXy0",
+    "title": "Valentine",
+    "description": ""
   }
 }

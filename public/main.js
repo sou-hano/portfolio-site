@@ -2,7 +2,7 @@
 fetch('signed_urls/common.json')
     .then(res => res.json())
     .then(data => {
-        const logoData = data["portfolio_images/common/Logo"];
+        const logoData = data["portfolio_images/common/Title"];
         if (logoData && logoData.url) {
             const logoImg = document.createElement('img');
             logoImg.src = logoData.url;
@@ -75,6 +75,83 @@ fetch('signed_urls/original.json')
                 console.warn(`画像が見つかりませんでした: ${id}`);
             }
         });
+
+        // targets に含まれない画像を背景用に抽出
+        const bgEntries = Object.entries(json).filter(([id]) => !targets.includes(id));
+
+        const originalBackground = document.getElementById("original-background");
+        const originalContainer = document.getElementById("original");
+        const header = document.querySelector("header");
+
+        // 同じ画像を～枚づつ配置
+        numSameImage = 1;
+
+        if (originalBackground && originalContainer) {
+            const gap = 20;
+            // 画像一枚の大きさ
+            const tileWidth = 180;
+            const tileHeight = tileWidth * 4 / 3;
+
+            const containerWidth = originalBackground.offsetWidth || window.innerWidth * 2;
+            const containerHeight = originalBackground.offsetHeight || window.innerHeight;
+            const columns = Math.floor((containerWidth + gap) / (tileWidth + gap));
+            const rows = Math.floor((containerHeight - header.offsetHeight + gap) / (tileHeight + gap));
+
+            const maxTiles = columns * rows;
+            const maxUsableImages = Math.floor(maxTiles / numSameImage);
+            const selectedEntries = bgEntries.slice(0, maxUsableImages);
+            const totalImages = selectedEntries.length * numSameImage;
+            const interval = Math.floor(maxTiles / totalImages);
+
+            let tileIndex = 0;
+
+            for (let i = 0; i < selectedEntries.length; i++) {
+                const [id, item] = selectedEntries[i];
+                for (let j = 0; j < numSameImage; j++) {
+                    const index = tileIndex * interval;
+                    const col = index % columns;
+                    const row = Math.floor(index / columns);
+
+                    if (row >= rows) break;
+
+                    const img = document.createElement("img");
+                    img.src = item.url;
+                    img.alt = item.title || "";
+                    img.className = "original-background-tile";
+
+                    const left = gap + col * (tileWidth + gap);
+                    const top = header.offsetHeight + gap + row * (tileHeight + gap); // ヘッダ高さ分オフセット
+
+                    img.style.left = `${left}px`;
+                    img.style.top = `${top}px`;
+                    img.style.width = `${tileWidth}px`;
+                    img.style.height = `${tileHeight}px`;
+
+                    originalBackground.appendChild(img);
+
+                    tileIndex++;
+                }
+            }
+
+            // 左画面外に150%はみ出して初期配置
+            originalBackground.style.transform = `translateX(-${window.innerWidth* 1.5}px)`;
+
+            // スクロールに応じて背景を左→右へ移動（2倍速）
+            window.addEventListener("scroll", () => {
+                const sectionHeight = originalContainer.offsetHeight;
+                const offsetTop = originalContainer.offsetTop;
+                const scrollY = window.scrollY;
+                const progress = Math.min((scrollY - offsetTop) / sectionHeight, 1);
+
+                const bgWidth = originalBackground.scrollWidth;
+                const screenWidth = window.innerWidth;
+                // ±150%分移動
+                const totalShift = screenWidth * 2.5;
+                const translateX = -screenWidth * 1.5 + progress * totalShift;
+
+                originalBackground.style.transform = `translateX(${translateX}px)`;
+            });
+        }
     })
     .catch(err => {
         console.error("original画像の読み込みに失敗しました:", err);
@@ -225,6 +302,15 @@ modal.onclick = (event) => {
 };
 
 
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const backgroundContainer = document.querySelector(".pokemon-background-container");
+    if (backgroundContainer) {
+        backgroundContainer.classList.remove("visible");
+    }
+});
+
 // タイルグループ生成関数
 function createTileGroup(images) {
     const tileGroup = document.createElement('div');
@@ -242,40 +328,6 @@ function createTileGroup(images) {
 
 const scrollDuration = 50000; // 50,000秒ごとにループ
 // ポケモン背景表示判定
-document.addEventListener('DOMContentLoaded', () => {
-    const background = document.querySelector('.pokemon-background-global');
-    const pokemonSection = document.querySelector('.pokemon-section'); // classで取得
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                background.classList.add('visible');
-
-                // 表示領域ならアニメーション再開
-                if (!animationTimer) {
-                    animationTimer = setInterval(() => {
-                        shiftAndLoop(scrollDuration);
-                    }, scrollDuration);
-                }
-            } else {
-                background.classList.remove('visible');
-
-                // アニメーション停止
-                if (animationTimer) {
-                    clearInterval(animationTimer);
-                    animationTimer = null;
-                }
-            }
-        });
-    }, {
-        root: null,
-        threshold: 0.2
-    });
-
-    if (pokemonSection) {
-        observer.observe(pokemonSection);
-    }
-});
 
 const groupSize = 140; // 7行 * 10列
 let bgIndex = 0;
@@ -303,6 +355,7 @@ const initPokemonBackground = () => {
     animationTimer = setInterval(() => {
         shiftAndLoop(scrollDuration);
     }, scrollDuration);
+    shiftAndLoop(scrollDuration);
 };
 
 // 次の画像グループ取得（groupSize枚）
@@ -390,11 +443,42 @@ fetch('signed_urls/fanart.json')
         displayGroup(kingsraid, kingsContainer, json);
         displayGroup(others, otherContainer, json);
 
-        // main-page のときのみ背景画像の初期化
-        if (document.querySelector('#main-page').classList.contains('active-page')) {
-            initPokemonBackground();
-            document.querySelector('.pokemon-background-global').classList.add('visible');
-        }
+        // 背景アニメーションだけは即開始（visibleは付けない）
+        initPokemonBackground();
+        document.body.classList.remove('no-pokemon'); // ← display: none を解除
+
+        // 背景のスクロール制御
+        const pokemonSection = document.querySelector('.pokemon-section');
+        const pokemonBackground = document.querySelector('.pokemon-background-global');
+
+        // セクションが見えたら表示
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    pokemonBackground.classList.add('visible');
+
+                    if (!animationTimer) {
+                        animationTimer = setInterval(() => {
+                            shiftAndLoop(scrollDuration);
+                        }, scrollDuration);
+                        shiftAndLoop(scrollDuration); // ← 即時1回目も動かす
+                    }
+                }
+                else {
+                    pokemonBackground.classList.remove('visible');
+
+                    if (animationTimer) {
+                        clearInterval(animationTimer);
+                        animationTimer = null;
+                    }
+                }
+            });
+        }, {
+            root: null,
+            threshold: 0.2
+        });
+
+        if (pokemonSection) observer.observe(pokemonSection);
     })
     .catch(err => {
         console.error("fanart画像の読み込みに失敗しました:", err);

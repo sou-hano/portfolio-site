@@ -1,7 +1,7 @@
 {
-  "portfolio_images/common/Logo": {
-    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--xQRCn7YQ--/f_auto,q_auto/v1/portfolio_images/common/Logo?_a=BAMClqXy0",
-    "title": "Logo",
+  "portfolio_images/common/Title": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--ZPqefSxx--/f_auto,q_auto/v1/portfolio_images/common/Title?_a=BAMClqXy0",
+    "title": "Title",
     "description": ""
   }
 }

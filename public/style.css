@@ -339,6 +339,46 @@ img.hover-zoom:hover {
     cursor: pointer;
 }
 
+.original-background-global {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    /* 前景の後ろ*/
+    z-index: -1;
+    overflow: hidden;
+}
+
+#original-background {
+    position: relative;
+    width: 300vw;
+    height: 100%;
+}
+
+/* 背景画像 */
+.original-background-tile {
+    position: absolute;
+    object-fit: cover;
+    opacity: 0.3;
+    border-radius: 6px;
+    pointer-events: none;
+    transition: transform 0.1s ease-out;
+}
+
+/* 上方向へのアニメーション */
+@keyframes scrollOriginalUp {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-100vh);
+    }
+}
+
+
 @keyframes scrollBackground {
     0% {
         transform: translateX(0);
@@ -387,6 +427,26 @@ img.hover-zoom:hover {
     grid-template-columns: repeat(auto-fill, 1fr);
     grid-auto-rows: min-content;
     gap: 2px;
+}
+
+.pokemon-background-container {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+}
+
+.pokemon-background-container.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 背景アニメーション一時停止 */
+.pokemon-background-container.paused .scrolling-container {
+    animation-play-state: paused;
+}
+
+body.no-pokemon .pokemon-background-global {
+    display: none !important;
 }
 
 
@@ -490,15 +550,6 @@ footer {
     color: #666;
     font-size: 0.9em;
 }
-
-
-body:not(.pokemon-ready) .pokemon-background-global {
-  display: none;
-}
-body.pokemon-ready .pokemon-background-global {
-  display: block;
-}
-
 
 
 /* カスタムカーソル */
