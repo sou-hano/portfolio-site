@@ -41,7 +41,7 @@ header#main-header {
     margin: 0;
     /* 各メニューの間隔 */
     gap: 1em;
-
+    padding-bottom: 0.5em;
 }
 
 /* main-nav内 <a> 要素（リンク）に適用 */
@@ -49,19 +49,32 @@ header#main-header {
     /* リンクの下線を消す */
     text-decoration: none;
     color: #333;
-    /* 通常よりやや太めの文字 */
+    /* やや太め */
     font-weight: 500;
+    font-size: 1.1rem;
+    /* クリック範囲拡大 */
+    padding: 0.6em 1.2em;
+    /* 余白 */
+    letter-spacing: 0.03em;
+}
+
+
+.main-nav li:hover+#sub-nav-main {
+    display: block;
 }
 
 /* ------------------------------
  サブナビゲーションメニュー（ジャンル切替）
 --------------------------------- */
 /* sub-nav に適用 */
+/* 初期は非表示にしておきJSで制御 */
 .sub-nav {
     padding: 0.5em 1em;
     background-color: #e4e4e488;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
+    display: none;
+    transition: opacity 0.3s ease;
 }
 
 /* sub-nav内 <ul> に適用 */
@@ -69,7 +82,7 @@ header#main-header {
     list-style: none;
     /* 横並び */
     display: flex;
-    gap: 1em;
+    gap: 0.5em;
     padding: 0;
     margin: 0;
 }
@@ -78,8 +91,15 @@ header#main-header {
 .sub-nav a {
     text-decoration: none;
     color: #555;
-    /* 少し小さめの文字サイズ */
-    font-size: 0.9em;
+    /* 少し大きめの文字サイズ */
+    font-size: 1em;
+    font-weight: 500;
+    /* 上下左右の余白拡大（クリック範囲の増大） */
+    padding: 0.4em 1em;
+    /* パディングが有効になるように */
+    display: inline-block;
+    /* 文字間も少し空けて読みやすく */
+    letter-spacing: 0.01em;
 }
 
 /* ------------------------------
@@ -119,8 +139,19 @@ main {
 
 /* <h2>（ジャンルの見出し）に適用 */
 .genre-section h2 {
-    font-size: 1.4em;
+    font-size: 1.6em;
+    font-weight: 600;
     margin-bottom: 1em;
+    margin-left: 2em;
+    letter-spacing: 0.02em;
+}
+
+.fanart-subsection h3 {
+    text-align: center;
+    font-size: 1.3em;
+    /* 任意：見出しらしいサイズに調整 */
+    margin-bottom: 1em;
+    /* 任意：下に余白追加 */
 }
 
 /* ------------------------------
@@ -363,6 +394,7 @@ img.hover-zoom:hover {
     /*  140px × 20列 = 2800px */
     grid-template-columns: repeat(20, 140px);
     grid-auto-rows: 140px;
+
     gap: 8px;
     /* padding を 0 にして余白を除く */
     padding: 0;
@@ -461,75 +493,82 @@ footer {
 
 /* カスタムカーソル */
 .cursor-ring {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  background-color: rgb(118, 118, 118);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 3000;
-  transform: translate(-50%, -50%);
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background-color: rgb(118, 118, 118);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 3000;
+    transform: translate(-50%, -50%);
 }
+
 .cursor-ring--dark {
-  background-color: black;
+    background-color: black;
 }
+
 .cursor-ring--light {
-  background-color: white;
+    background-color: white;
 }
 
 /* クリック時の波紋 */
 .ripple {
-  position: fixed;
-  width: 20px;
-  height: 20px;
-   /* 波紋らしい淡い輪郭 */
-  border: 2px solid rgba(0, 0, 0, 0.5); 
-  /* 円の塗り潰しを排除 */
-  background-color: transparent;         
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 2999;
-  /* 初期サイズを縮小 */
-  transform: translate(-50%, -50%) scale(0.2); 
-  animation: ripple-expand 0.6s ease-out forwards;
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    /* 波紋らしい淡い輪郭 */
+    border: 2px solid rgba(0, 0, 0, 0.5);
+    /* 円の塗り潰しを排除 */
+    background-color: transparent;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2999;
+    /* 初期サイズを縮小 */
+    transform: translate(-50%, -50%) scale(0.2);
+    animation: ripple-expand 0.6s ease-out forwards;
 }
 
 @keyframes ripple-expand {
-  0% {
-    transform: translate(-50%, -50%) scale(0.2);  /* スタート時に見えない程度に小さく */
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.3;  /* 徐々に出現 */
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(3);
-    opacity: 0;
-  }
+    0% {
+        transform: translate(-50%, -50%) scale(0.2);
+        /* スタート時に見えない程度に小さく */
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.3;
+        /* 徐々に出現 */
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+    }
 }
 
 /* 三角パーティクル */
 .particle {
-  position: fixed;
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 6px solid rgb(177, 177, 177);
-  opacity: 0.8;
-  pointer-events: none;
-  z-index: 2998;
-  transform: translate(-50%, -50%) rotate(0deg);
-  animation: particle-move 0.6s linear forwards;
+    position: fixed;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 6px solid rgb(177, 177, 177);
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 2998;
+    transform: translate(-50%, -50%) rotate(0deg);
+    animation: particle-move 0.6s linear forwards;
 }
 
 @keyframes particle-move {
-  0% {
-    transform: translate(-50%, -50%) scale(1) rotate(0deg);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translate(-50%, -80%) scale(0.5) rotate(180deg);
-    opacity: 0;
-  }
+    0% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translate(-50%, -80%) scale(0.5) rotate(180deg);
+        opacity: 0;
+    }
 }

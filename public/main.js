@@ -2,7 +2,7 @@
 fetch('signed_urls/common.json')
     .then(res => res.json())
     .then(data => {
-        const logoData = data["portfolio_images/common/TitleLogo"];
+        const logoData = data["portfolio_images/common/Logo"];
         if (logoData && logoData.url) {
             const logoImg = document.createElement('img');
             logoImg.src = logoData.url;
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-const groupSize = 120;
+const groupSize = 140; // 7行 * 10列
 let bgIndex = 0;
 let backgroundGrid;
 let backgroundImages = [];
@@ -368,7 +368,7 @@ fetch('signed_urls/fanart.json')
         );
 
         // 前景画像表示処理
-        const displayGroup = (entries, container) => {
+        const displayGroup = (entries, container, jsonData) => {
             const groupTargets = entries.map(([id]) => id);
             entries.forEach(([id, item]) => {
                 const img = document.createElement('img');
@@ -379,25 +379,34 @@ fetch('signed_urls/fanart.json')
 
                 img.addEventListener("click", () => {
                     const index = groupTargets.indexOf(id);
-                    showModal(index, "right", groupTargets, json);
+                    showModal(index, "right", groupTargets, jsonData);
                 });
 
                 container.appendChild(img);
             });
         };
 
-        displayGroup(pokemonImages, overlay);
-        displayGroup(kingsraid, kingsContainer);
-        displayGroup(others, otherContainer);
+        displayGroup(pokemonImages, overlay, json);
+        displayGroup(kingsraid, kingsContainer, json);
+        displayGroup(others, otherContainer, json);
 
-        // 背景画像の初期化（すでに backgroundImages は設定済み）
-        initPokemonBackground();
-        document.querySelector('.pokemon-background-global').classList.add('visible');
+        // main-page のときのみ背景画像の初期化
+        if (document.querySelector('#main-page').classList.contains('active-page')) {
+            initPokemonBackground();
+            document.querySelector('.pokemon-background-global').classList.add('visible');
+        }
     })
     .catch(err => {
         console.error("fanart画像の読み込みに失敗しました:", err);
     });
 
+
+
+
+
+//
+// カーソル
+//
 // モバイル端末の場合カーソル処理切り替え
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
@@ -473,4 +482,54 @@ setInterval(() => {
 
     document.body.appendChild(particle);
     particle.addEventListener('animationend', () => particle.remove());
-}, 150); // 100msごとでパーティクルを発生
+}, 150); // 150msごとでパーティクルを発生
+
+
+//
+//  ヘッダ
+// 
+const navIllustration = document.querySelector('a[data-page="main-page"]');
+if (navIllustration) {
+    navIllustration.addEventListener('click', e => {
+        e.preventDefault(); // ページ内ジャンプを無効化（子要素のみジャンプ機能を付ける）
+    });
+}
+
+const subNavMain = document.getElementById('sub-nav-main');
+
+if (navIllustration && subNavMain) {
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    if (isTouchDevice) {
+        // モバイルではタップで子要素のトグル表示
+        navIllustration.addEventListener('touchstart', e => {
+            e.preventDefault();
+            e.stopPropagation(); // 他のタッチイベントに波及しないように
+            const currentlyVisible = subNavMain.style.display === 'block';
+            subNavMain.style.display = currentlyVisible ? 'none' : 'block';
+        });
+
+        // 他の場所タップで非表示に戻す
+        document.addEventListener('touchstart', e => {
+            if (!navIllustration.contains(e.target) && !subNavMain.contains(e.target)) {
+                subNavMain.style.display = 'none';
+            }
+        });
+    } else {
+        // PCではホバーで表示／離れると非表示
+        navIllustration.addEventListener('mouseenter', () => {
+            subNavMain.style.display = 'block';
+        });
+        navIllustration.addEventListener('mouseleave', () => {
+            subNavMain.style.display = 'none';
+        });
+
+        // navからサブナビへのマウス移動も許容
+        subNavMain.addEventListener('mouseenter', () => {
+            subNavMain.style.display = 'block';
+        });
+        subNavMain.addEventListener('mouseleave', () => {
+            subNavMain.style.display = 'none';
+        });
+    }
+}
