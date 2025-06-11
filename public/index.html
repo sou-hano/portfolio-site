@@ -14,7 +14,7 @@
 
 <!-- 背景非表示用クラス -->
 
-<body class="no-pokemon">
+<body class="no-poke">
   <!-- ヘッダー：ページ・セクション切替メニュー -->
   <header id="main-header">
     <!-- サイトロゴ -->
@@ -49,7 +49,7 @@
   -->
     <nav class="sub-nav" id="sub-nav-profile" style="display: none;">
       <ul>
-        <li><a href="#history">About Me</a></li>
+        <li><a href="#history">経歴</a></li>
       </ul>
     </nav>
   </header>
@@ -75,9 +75,9 @@
 
       <section class="genre-section" id="fanart-anchor">
         <h2>ファンアート</h2>
-        <section class="fanart-subsection pokemon-section">
+        <section class="fanart-subsection poke-section">
           <h3>ポケモン100日チャレンジ! (計200枚)</h3>
-          <div class="image-overlay" id="pokemon-overlay"></div>
+          <div class="image-overlay" id="poke-overlay"></div>
         </section>
 
         <section class="fanart-subsection kingsraid-section">
@@ -110,9 +110,31 @@
 
     <!-- ユーザー情報ページ -->
     <section id="profile-page" class="page">
-      <section id="history">
+      <section id="history" class="genre-section">
         <h2>About Me</h2>
-        <p>ここに自己紹介などを記述</p>
+        <p>
+          豊橋技術科学大学 修士1年<br>
+          <span class="institution">知能材料ロボティクス研究室　羽野 蒼一郎</span>
+          <span class="institution">E-mail：hano.soichiro.sc[at]tut.jp</span>
+        </p>
+
+        <div class="about-subsection" id="career">
+          <h3>経歴</h3>
+          <ul class="career-timeline">
+            <li>
+              <strong>2018年4月〜2023年3月：</strong><br>
+              <span class="institution">東京工業高等専門学校 機械工学科 卒業</span>
+            </li>
+            <li>
+              <strong>2023年4月〜2025年3月：</strong><br>
+              <span class="institution">豊橋技術科学大学 工学部 機械工学課程 卒業</span>
+            </li>
+            <li>
+              <strong>2025年4月〜2027年4月：</strong><br>
+              <span class="institution">豊橋技術科学大学大学院 工学研究科 機械工学専攻 卒業見込み</span>
+            </li>
+          </ul>
+        </div>
       </section>
     </section>
   </main>
@@ -122,9 +144,9 @@
   <footer>
     <nav class="footer-nav">
       <ul>
-        <li><a href="#original">オリジナル</a></li>
-        <li><a href="#collab">合作</a></li>
-        <li><a href="#fanart">ファンアート</a></li>
+        <li><a href="#original-anchor">オリジナル</a></li>
+        <li><a href="#collab-anchor">合作</a></li>
+        <li><a href="#fanart-anchor">ファンアート</a></li>
         <!--
         <li><a href="#work1">製作物1</a></li>
         <li><a href="#work2">製作物2</a></li>
@@ -159,9 +181,9 @@
   <script src="main.js"></script>
 
   <!-- ポケモン背景専用スライダー：ページ全体に配置 -->
-  <div class="pokemon-background-global">
+  <div class="poke-background-global">
     <!-- この子要素に画像を配置 -->
-    <div id="pokemon-background-grid"></div>
+    <div id="poke-background-grid"></div>
   </div>
   </div>
 </body>

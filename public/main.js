@@ -1,3 +1,20 @@
+// ===============================
+// 初期共通定義・定数
+// ===============================
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+document.addEventListener("DOMContentLoaded", () => {
+    const backgroundContainer = document.querySelector(".poke-background-container");
+    if (backgroundContainer) {
+        backgroundContainer.classList.remove("visible");
+    }
+});
+
+
+// ===============================
+// 画像の読み込み・描画処理
+// ===============================
+
 // タイトルロゴ画像を common.json から読み込んで挿入
 fetch('signed_urls/common.json')
     .then(res => res.json())
@@ -8,8 +25,7 @@ fetch('signed_urls/common.json')
             logoImg.src = logoData.url;
             logoImg.alt = "Title Logo";
             document.getElementById('site-logo').appendChild(logoImg);
-        }
-        else {
+        } else {
             console.warn("TitleLogo のURLが見つかりませんでした");
         }
     })
@@ -17,20 +33,8 @@ fetch('signed_urls/common.json')
         console.error("ロゴ画像の読み込みに失敗しました:", err);
     });
 
-// モーダル要素を取得
-const modal = document.getElementById("image-modal");
-const modalTitle = document.getElementById("modal-title");
-const modalDesc = document.getElementById("modal-description");
-const modalClose = document.querySelector(".modal-close");
-const modalPrev = document.getElementById("modal-prev");
-const modalNext = document.getElementById("modal-next");
 
-let currentIndex = 0;
-let touchStartX = 0;
-let targets = [];
-let data = {};
-
-// original.json を読み込んで画像を表示
+// original.json を読み込んで画像を表示、背景演出
 fetch('signed_urls/original.json')
     .then(res => res.json())
     .then(json => {
@@ -84,7 +88,7 @@ fetch('signed_urls/original.json')
         const header = document.querySelector("header");
 
         // 同じ画像を～枚づつ配置
-        numSameImage = 1;
+        const numSameImage = 1;
 
         if (originalBackground && originalContainer) {
             const gap = 20;
@@ -92,6 +96,7 @@ fetch('signed_urls/original.json')
             const tileWidth = 180;
             const tileHeight = tileWidth * 4 / 3;
 
+            // タイルに入る画像の行数と列数を計算
             const containerWidth = originalBackground.offsetWidth || window.innerWidth * 2;
             const containerHeight = originalBackground.offsetHeight || window.innerHeight;
             const columns = Math.floor((containerWidth + gap) / (tileWidth + gap));
@@ -134,18 +139,17 @@ fetch('signed_urls/original.json')
             }
 
             // 左画面外に150%はみ出して初期配置
-            originalBackground.style.transform = `translateX(-${window.innerWidth* 1.5}px)`;
+            originalBackground.style.transform = `translateX(-${window.innerWidth * 1.5}px)`;
 
-            // スクロールに応じて背景を左→右へ移動（2倍速）
+            // スクロールに応じて背景を左から右へ移動
             window.addEventListener("scroll", () => {
                 const sectionHeight = originalContainer.offsetHeight;
                 const offsetTop = originalContainer.offsetTop;
                 const scrollY = window.scrollY;
                 const progress = Math.min((scrollY - offsetTop) / sectionHeight, 1);
 
-                const bgWidth = originalBackground.scrollWidth;
                 const screenWidth = window.innerWidth;
-                // ±150%分移動
+                // 左に150%オーバーから右に150%オーバーまで移動
                 const totalShift = screenWidth * 2.5;
                 const translateX = -screenWidth * 1.5 + progress * totalShift;
 
@@ -198,194 +202,8 @@ fetch('signed_urls/collaboration.json')
         console.error("collab画像の読み込みに失敗しました:", err);
     });
 
-// モーダル用現在のセクション保持変数
-let currentTargets = [];
-let currentData = {};
 
-// モーダルを表示し、画像＋テキスト切り替え
-function showModal(index, direction = "right", activeTargets = targets, activeData = data) {
-    // 現在の表示対象を記録
-    currentTargets = activeTargets;
-    currentData = activeData;
-
-    const id = activeTargets[index];
-    const item = activeData[id];
-
-    if (!item) return;
-
-    const wrapper = document.querySelector(".flip-wrapper");
-    const frontImg = document.getElementById("modal-image-current");
-    const caption = document.getElementById("modal-caption");
-
-    // キャプション一時非表示
-    modal.style.display = "block"; //modal表示
-    caption.classList.remove("visible");
-
-    // 初期化
-    wrapper.style.transition = 'none';
-    wrapper.style.transform = 'rotateY(0deg)';
-    frontImg.style.transition = 'none';
-    frontImg.style.transform = 'scaleX(1)';
-    void wrapper.offsetWidth; // リフローを強制して再描画（transition再適用のため）
-
-    // 回転スタート：元画像で90度まで（半分だけ）
-    wrapper.style.transition = 'transform 0.4s ease';
-    wrapper.style.transform = direction === "right" ? "rotateY(90deg)" : "rotateY(-90deg)";
-
-    // 90度になったら新画像に切り替え、180度まで回転
-    setTimeout(() => {
-        frontImg.src = item.url;
-        modalTitle.textContent = item.title || "";
-        modalDesc.innerHTML = item.description || ""; // innerHTMLにして.json内の改行<br>を認識するようにする
-
-        // アニメーション中だけ反転を適用
-        frontImg.style.transition = 'transform 0.4s ease';
-        frontImg.style.transform = 'scaleX(-1)';
-
-        // 180度まで継続回転
-        wrapper.style.transition = 'transform 0.4s ease';
-        wrapper.style.transform = direction === "right" ? "rotateY(180deg)" : "rotateY(-180deg)";
-    }, 400);
-
-    // アニメーションを待ってから表画像を更新し、wrapperをリセット
-    setTimeout(() => {
-        wrapper.style.transition = 'none';
-        wrapper.style.transform = "rotateY(0deg)";
-        // 画像反転リセット 
-        frontImg.style.transition = 'none';
-        frontImg.style.transform = 'scaleX(1)';
-
-        caption.classList.add("visible");
-        currentIndex = index;
-    }, 800);
-}
-
-// < >ボタンで画像切り替え、最初と末尾はループ
-modalPrev.addEventListener("click", () => {
-    const prevIndex = (currentIndex - 1 + currentTargets.length) % currentTargets.length;
-    showModal(prevIndex, "left", currentTargets, currentData);
-});
-
-modalNext.addEventListener("click", () => {
-    const nextIndex = (currentIndex + 1) % currentTargets.length;
-    showModal(nextIndex, "right", currentTargets, currentData);
-});
-
-// モバイル向けスワイプ切り替え操作
-modal.addEventListener("touchstart", e => {
-    touchStartX = e.changedTouches[0].screenX;
-});
-
-modal.addEventListener("touchend", e => {
-    const touchEndX = e.changedTouches[0].screenX;
-    const deltaX = touchEndX - touchStartX;
-    if (Math.abs(deltaX) > 50) {
-        if (deltaX > 0) {
-            const prevIndex = (currentIndex - 1 + currentTargets.length) % currentTargets.length;
-            showModal(prevIndex, "left", currentTargets, currentData);
-        } else {
-            const nextIndex = (currentIndex + 1) % currentTargets.length;
-            showModal(nextIndex, "right", currentTargets, currentData);
-        }
-    }
-});
-
-
-// モーダルを閉じる処理
-modalClose.onclick = () => {
-    modal.style.display = "none";
-};
-modal.onclick = (event) => {
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
-};
-
-
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    const backgroundContainer = document.querySelector(".pokemon-background-container");
-    if (backgroundContainer) {
-        backgroundContainer.classList.remove("visible");
-    }
-});
-
-// タイルグループ生成関数
-function createTileGroup(images) {
-    const tileGroup = document.createElement('div');
-    tileGroup.className = 'tile-group';
-
-    images.forEach(([id, item]) => {
-        const img = document.createElement('img');
-        img.classList.add('hover-zoom');
-        img.src = item.url;
-        img.alt = item.title || "";
-        tileGroup.appendChild(img);
-    });
-    return tileGroup;
-}
-
-const scrollDuration = 50000; // 50,000秒ごとにループ
-// ポケモン背景表示判定
-
-const groupSize = 140; // 7行 * 10列
-let bgIndex = 0;
-let backgroundGrid;
-let backgroundImages = [];
-let isBackgroundInitialized = false;
-let animationTimer = null;
-
-// 初回のみ背景画像の初期化処理
-const initPokemonBackground = () => {
-    if (isBackgroundInitialized) return;
-    isBackgroundInitialized = true;
-
-    backgroundGrid = document.getElementById('pokemon-background-grid');
-
-    // 背景画像初期2グループ生成
-    backgroundGrid.appendChild(createTileGroup(getNextImageSlice()));
-    backgroundGrid.appendChild(createTileGroup(getNextImageSlice()));
-
-    // 初回スクロール開始
-    backgroundGrid.style.transition = `transform ${scrollDuration}ms linear`;
-    backgroundGrid.style.transform = 'translateX(-50%)';
-
-    // ループアニメーション
-    animationTimer = setInterval(() => {
-        shiftAndLoop(scrollDuration);
-    }, scrollDuration);
-    shiftAndLoop(scrollDuration);
-};
-
-// 次の画像グループ取得（groupSize枚）
-function getNextImageSlice() {
-    const slice = backgroundImages.slice(bgIndex, bgIndex + groupSize);
-    bgIndex = (bgIndex + groupSize) % backgroundImages.length;
-    return slice.length < groupSize
-        ? slice.concat(backgroundImages.slice(0, groupSize - slice.length))
-        : slice;
-}
-
-function shiftAndLoop(duration) {
-    // アニメーション後に最初の tile-group を消して、最後に追加して滑らかにつなぐ
-    const firstGroup = backgroundGrid.firstElementChild;
-    if (!firstGroup) return;
-
-    const newGroup = createTileGroup(getNextImageSlice());
-
-    backgroundGrid.appendChild(newGroup);
-    backgroundGrid.removeChild(firstGroup);
-
-    // リセットトリガー用にアニメーションを強制再適用（CSS以外でスクロールするなら不要）
-    backgroundGrid.style.transition = 'none';
-    backgroundGrid.style.transform = 'translateX(0)';
-    void backgroundGrid.offsetWidth;
-
-    backgroundGrid.style.transition = `transform ${duration}ms linear`;
-    backgroundGrid.style.transform = 'translateX(-50%)';
-}
-
+// fanart.json を読み込み、背景画像+ポケモン前景、King's Raid、その他を表示
 // 二次創作
 fetch('signed_urls/fanart.json')
     .then(res => res.json())
@@ -398,13 +216,13 @@ fetch('signed_urls/fanart.json')
         ).slice(0, 200);
 
 
-        // 以下は前景画像の処理（Pokemon, King'sRaid, その他）
-        const overlay = document.getElementById('pokemon-overlay');
+        // 前景画像（Pokemon, King'sRaid, その他）
+        const overlay = document.getElementById('poke-overlay');
         const kingsContainer = document.getElementById('kingsraid');
         const otherContainer = document.getElementById('otherfanart');
 
-        // 前面：Pokemon フォルダのみ
-        const pokemonImages = allEntries.filter(([id]) =>
+        // 前景用Pokemonフォルダの画像を取得
+        const pokeImages = allEntries.filter(([id]) =>
             id.includes('/fanart/Pokemon/')
         );
 
@@ -413,10 +231,10 @@ fetch('signed_urls/fanart.json')
             id.includes("King'sRaid_")
         );
 
-        // その他
+        // その他前景
         const others = allEntries.filter(([id, item]) =>
             !backgroundImages.some(([bgId]) => bgId === id) &&
-            !pokemonImages.some(([fgId]) => fgId === id) &&
+            !pokeImages.some(([fgId]) => fgId === id) &&
             !id.includes("King'sRaid_")
         );
 
@@ -439,33 +257,33 @@ fetch('signed_urls/fanart.json')
             });
         };
 
-        displayGroup(pokemonImages, overlay, json);
+        displayGroup(pokeImages, overlay, json);
         displayGroup(kingsraid, kingsContainer, json);
         displayGroup(others, otherContainer, json);
 
-        // 背景アニメーションだけは即開始（visibleは付けない）
-        initPokemonBackground();
-        document.body.classList.remove('no-pokemon'); // ← display: none を解除
+        // 背景アニメーション即開始（visibleは付けない）
+        initPokeBackground();
+        document.body.classList.remove('no-poke'); // display: none を解除
 
         // 背景のスクロール制御
-        const pokemonSection = document.querySelector('.pokemon-section');
-        const pokemonBackground = document.querySelector('.pokemon-background-global');
+        const pokeSection = document.querySelector('.poke-section');
+        const pokeBackground = document.querySelector('.poke-background-global');
 
         // セクションが見えたら表示
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    pokemonBackground.classList.add('visible');
+                    pokeBackground.classList.add('visible');
 
                     if (!animationTimer) {
                         animationTimer = setInterval(() => {
                             shiftAndLoop(scrollDuration);
                         }, scrollDuration);
-                        shiftAndLoop(scrollDuration); // ← 即時1回目も動かす
+                        shiftAndLoop(scrollDuration); // 即時1回目も動かす
                     }
                 }
                 else {
-                    pokemonBackground.classList.remove('visible');
+                    pokeBackground.classList.remove('visible');
 
                     if (animationTimer) {
                         clearInterval(animationTimer);
@@ -478,7 +296,7 @@ fetch('signed_urls/fanart.json')
             threshold: 0.2
         });
 
-        if (pokemonSection) observer.observe(pokemonSection);
+        if (pokeSection) observer.observe(pokeSection);
     })
     .catch(err => {
         console.error("fanart画像の読み込みに失敗しました:", err);
@@ -486,15 +304,216 @@ fetch('signed_urls/fanart.json')
 
 
 
+// ポケモン背景用
+const scrollDuration = 50000; // 50,000秒ごとにループ
+const groupSize = 140; // 7行 * 20列
+let bgIndex = 0;
+let backgroundGrid;
+let backgroundImages = [];
+let isBackgroundInitialized = false;
+let animationTimer = null;
 
 
-//
+document.addEventListener("DOMContentLoaded", () => {
+    const backgroundContainer = document.querySelector(".poke-background-container");
+    if (backgroundContainer) {
+        backgroundContainer.classList.remove("visible");
+    }
+});
+
+// 初回のみ背景画像の初期化処理
+const initPokeBackground = () => {
+    if (isBackgroundInitialized) return;
+    isBackgroundInitialized = true;
+
+    backgroundGrid = document.getElementById('poke-background-grid');
+
+    // 背景画像初期2グループ生成
+    backgroundGrid.appendChild(createTileGroup(getNextImageSlice()));
+    backgroundGrid.appendChild(createTileGroup(getNextImageSlice()));
+
+    // 初回スクロール開始
+    backgroundGrid.style.transition = `transform ${scrollDuration}ms linear`;
+    backgroundGrid.style.transform = 'translateX(-50%)';
+
+    // ループアニメーション
+    animationTimer = setInterval(() => {
+        shiftAndLoop(scrollDuration);
+    }, scrollDuration);
+    shiftAndLoop(scrollDuration);
+};
+
+// タイルグループ生成関数
+function createTileGroup(images) {
+    const tileGroup = document.createElement('div');
+    tileGroup.className = 'tile-group';
+
+    images.forEach(([id, item]) => {
+        const img = document.createElement('img');
+        img.classList.add('hover-zoom');
+        img.src = item.url;
+        img.alt = item.title || "";
+        tileGroup.appendChild(img);
+    });
+    return tileGroup;
+}
+
+// 次の画像グループ取得（groupSize枚）
+function getNextImageSlice() {
+    const slice = backgroundImages.slice(bgIndex, bgIndex + groupSize);
+    bgIndex = (bgIndex + groupSize) % backgroundImages.length;
+    return slice.length < groupSize
+        ? slice.concat(backgroundImages.slice(0, groupSize - slice.length))
+        : slice;
+}
+
+function shiftAndLoop(duration) {
+    // アニメーション後に最初の tile-group を消し、新しいものを最後に追加して滑らかにつなぐ
+    const firstGroup = backgroundGrid.firstElementChild;
+    if (!firstGroup) return;
+
+    const newGroup = createTileGroup(getNextImageSlice());
+
+    backgroundGrid.appendChild(newGroup);
+    backgroundGrid.removeChild(firstGroup);
+
+    // リセットトリガー用にアニメーションを強制再適用
+    backgroundGrid.style.transition = 'none';
+    backgroundGrid.style.transform = 'translateX(0)';
+    void backgroundGrid.offsetWidth;
+
+    backgroundGrid.style.transition = `transform ${duration}ms linear`;
+    backgroundGrid.style.transform = 'translateX(-50%)';
+}
+
+
+// ===============================
+// モーダル処理
+// ===============================
+
+// モーダル用の現在のセクション保持変数
+let currentTargets = [];
+let currentData = {};
+
+// モーダル要素を取得
+const modal = document.getElementById("image-modal");
+const modalTitle = document.getElementById("modal-title");
+const modalDesc = document.getElementById("modal-description");
+const modalClose = document.querySelector(".modal-close");
+const modalPrev = document.getElementById("modal-prev");
+const modalNext = document.getElementById("modal-next");
+
+let currentIndex = 0;
+let touchStartX = 0;
+let targets = [];
+let data = {};
+
+
+// モーダルを表示し、画像・テキスト切り替え
+function showModal(index, direction = "right", activeTargets = targets, activeData = data) {
+    // 現在の表示対象をグローバル変数に記録
+    currentTargets = activeTargets;
+    currentData = activeData;
+
+    // 表示対象を取得
+    const id = activeTargets[index];
+    const item = activeData[id];
+    if (!item) return;
+
+    const wrapper = document.querySelector(".flip-wrapper");
+    const frontImg = document.getElementById("modal-image-current");
+    const caption = document.getElementById("modal-caption");
+
+
+    //modal表示
+    modal.style.display = "block";
+    // キャプション一時非表示
+    caption.classList.remove("visible");
+
+    // 初期化
+    wrapper.style.transition = 'none';
+    wrapper.style.transform = 'rotateY(0deg)';
+    frontImg.style.transition = 'none';
+    frontImg.style.transform = 'scaleX(1)';
+    void wrapper.offsetWidth; // リフローを強制して再描画し、transition再適用
+
+    // 元画像で90度まで回転
+    wrapper.style.transition = 'transform 0.4s ease';
+    wrapper.style.transform = direction === "right" ? "rotateY(90deg)" : "rotateY(-90deg)";
+
+    // 90度になったら新画像に切り替え、180度まで回転
+    setTimeout(() => {
+        frontImg.src = item.url;
+        modalTitle.textContent = item.title || "";
+        modalDesc.innerHTML = item.description || ""; // textContentではなくinnerHTMLにし.json内の改行<br>を認識するようにする
+
+        // アニメーション中は画像を左右反転
+        frontImg.style.transition = 'transform 0.4s ease';
+        frontImg.style.transform = 'scaleX(-1)';
+
+        // 180度まで継続回転
+        wrapper.style.transition = 'transform 0.4s ease';
+        wrapper.style.transform = direction === "right" ? "rotateY(180deg)" : "rotateY(-180deg)";
+    }, 400);
+
+    // アニメーションを待ってから表画像を更新し、wrapperをリセット
+    setTimeout(() => {
+        wrapper.style.transition = 'none';
+        wrapper.style.transform = "rotateY(0deg)";
+        // 画像反転リセット 
+        frontImg.style.transition = 'none';
+        frontImg.style.transform = 'scaleX(1)';
+
+        caption.classList.add("visible");
+        currentIndex = index;
+    }, 800);
+}
+
+// モバイル、PC共用：< > ボタンで画像切り替え、最初と末尾はループ
+modalPrev.addEventListener("click", () => {
+    const prevIndex = (currentIndex - 1 + currentTargets.length) % currentTargets.length;
+    showModal(prevIndex, "left", currentTargets, currentData);
+});
+modalNext.addEventListener("click", () => {
+    const nextIndex = (currentIndex + 1) % currentTargets.length;
+    showModal(nextIndex, "right", currentTargets, currentData);
+});
+
+// モバイル：スワイプ切り替え操作、最初と末尾はループ
+modal.addEventListener("touchstart", e => {
+    touchStartX = e.changedTouches[0].screenX;
+});
+modal.addEventListener("touchend", e => {
+    const touchEndX = e.changedTouches[0].screenX;
+    const deltaX = touchEndX - touchStartX;
+    if (Math.abs(deltaX) > 50) {
+        if (deltaX > 0) {
+            const prevIndex = (currentIndex - 1 + currentTargets.length) % currentTargets.length;
+            showModal(prevIndex, "left", currentTargets, currentData);
+        } else {
+            const nextIndex = (currentIndex + 1) % currentTargets.length;
+            showModal(nextIndex, "right", currentTargets, currentData);
+        }
+    }
+});
+
+// モーダルを閉じる処理
+modalClose.onclick = () => {
+    modal.style.display = "none";
+};
+modal.onclick = (event) => {
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+};
+
+
+// ===============================
 // カーソル
-//
-// モバイル端末の場合カーソル処理切り替え
-const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+// ===============================
 
-// カーソル本体（PCのみ表示）
+// モバイル端末の場合カーソル処理切り替え
+// カスタムカーソルリング本体（PCのみ表示）
 const cursorRing = document.createElement('div');
 cursorRing.classList.add('cursor-ring');
 if (!isTouchDevice) {
@@ -519,14 +538,10 @@ document.addEventListener('touchstart', e => {
     cursorY = e.touches[0].clientY;
 });
 
-// 波紋エフェクト
-document.addEventListener('mousedown', () => {
-    if (!isTouchDevice) showRipples();
-});
-document.addEventListener('touchstart', () => {
-    showRipples();
-});
 
+// ===============================
+// 波紋エフェクト
+// ===============================
 function showRipples() {
     for (let i = 0; i < 2; i++) {
         const ripple = document.createElement('div');
@@ -538,6 +553,17 @@ function showRipples() {
         ripple.addEventListener('animationend', () => ripple.remove());
     }
 }
+
+document.addEventListener('mousedown', () => {
+    if (!isTouchDevice) showRipples();
+});
+document.addEventListener('touchstart', () => {
+    showRipples();
+});
+
+// ===============================
+// パーティクル
+// ===============================
 
 // 三角パーティクル表示（PC：常時、モバイル：タップ中のみ）
 let allowParticles = !isTouchDevice;
@@ -569,51 +595,82 @@ setInterval(() => {
 }, 150); // 150msごとでパーティクルを発生
 
 
-//
-//  ヘッダ
-// 
-const navIllustration = document.querySelector('a[data-page="main-page"]');
-if (navIllustration) {
-    navIllustration.addEventListener('click', e => {
-        e.preventDefault(); // ページ内ジャンプを無効化（子要素のみジャンプ機能を付ける）
-    });
-}
+// ===============================
+// サブナビゲーション制御
+// ===============================
 
-const subNavMain = document.getElementById('sub-nav-main');
-
-if (navIllustration && subNavMain) {
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+// サブナビ
+function setupSubNavToggle(mainSelector, subSelector) {
+    const mainNav = document.querySelector(mainSelector);
+    const subNav = document.querySelector(subSelector);
+    if (!mainNav || !subNav) return;
 
     if (isTouchDevice) {
-        // モバイルではタップで子要素のトグル表示
-        navIllustration.addEventListener('touchstart', e => {
+        // モバイル
+        // タップでトグル表示
+        mainNav.addEventListener('click', (e) => {
             e.preventDefault();
-            e.stopPropagation(); // 他のタッチイベントに波及しないように
-            const currentlyVisible = subNavMain.style.display === 'block';
-            subNavMain.style.display = currentlyVisible ? 'none' : 'block';
+            e.stopPropagation();
+
+            // 他のsub-navが開かれたらを閉じる（同時に2個開かない）
+            document.querySelectorAll('.sub-nav').forEach(nav => {
+                if (nav !== subNav) nav.style.display = 'none';
+            });
+
+            const visible = subNav.style.display === 'block';
+            subNav.style.display = visible ? 'none' : 'block';
         });
 
-        // 他の場所タップで非表示に戻す
-        document.addEventListener('touchstart', e => {
-            if (!navIllustration.contains(e.target) && !subNavMain.contains(e.target)) {
-                subNavMain.style.display = 'none';
-            }
-        });
-    } else {
-        // PCではホバーで表示／離れると非表示
-        navIllustration.addEventListener('mouseenter', () => {
-            subNavMain.style.display = 'block';
-        });
-        navIllustration.addEventListener('mouseleave', () => {
-            subNavMain.style.display = 'none';
-        });
-
-        // navからサブナビへのマウス移動も許容
-        subNavMain.addEventListener('mouseenter', () => {
-            subNavMain.style.display = 'block';
-        });
-        subNavMain.addEventListener('mouseleave', () => {
-            subNavMain.style.display = 'none';
+        // 外部タップやスクロール・スワイプで閉じる
+        ['click', 'touchstart'].forEach(eventType => {
+            document.addEventListener(eventType, (e) => {
+                if (!mainNav.contains(e.target) && !subNav.contains(e.target)) {
+                    subNav.style.display = 'none';
+                }
+            });
         });
     }
+    else {
+        // PC
+        // ホバーで表示、離れると非表示
+        mainNav.addEventListener('mouseenter', () => subNav.style.display = 'block');
+        mainNav.addEventListener('mouseleave', () => subNav.style.display = 'none');
+        // サブナビ上にホバー中も表示維持
+        subNav.addEventListener('mouseenter', () => subNav.style.display = 'block');
+        subNav.addEventListener('mouseleave', () => subNav.style.display = 'none');
+        // クリック時にリンクジャンプ無効化
+        mainNav.addEventListener('click', e => e.preventDefault());
+    }
 }
+
+// イラスト
+setupSubNavToggle('a[data-page="main-page"]', '#sub-nav-main');
+// AboutMe
+setupSubNavToggle('a[data-page="profile-page"]', '#sub-nav-profile');
+
+
+// ===============================
+// SPAページ遷移／セクションスクロール制御
+// ===============================
+
+// サブナビリンク共通：アンカー先を含むページをアクティブにしてスクロール
+document.querySelectorAll('.sub-nav a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+        const anchor = link.getAttribute('href').substring(1); // "#"除去
+        const target = document.getElementById(anchor);
+        if (!target) return;
+
+        // 対象要素が属する.page を探してアクティブにする
+        const pageSection = target.closest('.page');
+        if (!pageSection) return;
+
+        // ページ切り替え
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        pageSection.classList.add('active-page');
+
+        // 少し遅らせて読み込みを待ってからスクロール
+        setTimeout(() => {
+            target.scrollIntoView({ behavior: 'smooth' });
+        }, 50);
+    });
+});
