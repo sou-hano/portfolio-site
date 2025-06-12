@@ -346,7 +346,7 @@ const initPokeBackground = () => {
 // タイルグループ生成関数
 function createTileGroup(images) {
     const tileGroup = document.createElement('div');
-    tileGroup.className = 'tile-group';
+    tileGroup.className = 'poke-tile-group';
 
     images.forEach(([id, item]) => {
         const img = document.createElement('img');
@@ -650,12 +650,14 @@ setupSubNavToggle('a[data-page="profile-page"]', '#sub-nav-profile');
 
 
 // ===============================
-// SPAページ遷移／セクションスクロール制御
+// SPA風ページ遷移・セクションスクロール制御
 // ===============================
 
 // サブナビリンク共通：アンカー先を含むページをアクティブにしてスクロール
-document.querySelectorAll('.sub-nav a[href^="#"]').forEach(link => {
+document.querySelectorAll('nav a[href^="#"], footer a[href^="#"]').forEach(link => {
     link.addEventListener('click', (e) => {
+        e.preventDefault(); // リンクジャンプを防ぐ
+
         const anchor = link.getAttribute('href').substring(1); // "#"除去
         const target = document.getElementById(anchor);
         if (!target) return;

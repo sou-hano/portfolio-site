@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
 
+<!-- <head> -->
+<!-- - メタ情報、タイトル、CSS・JS読み込み -->
+
 <head>
   <meta charset="UTF-8">
   <!-- 個人情報保護用：検索エンジンからのインデックス禁止、外部リンクからもたどらせない -->
@@ -12,22 +15,23 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<!-- 背景非表示用クラス -->
+
 
 <body class="no-poke">
-  <!-- ヘッダー：ページ・セクション切替メニュー -->
+  <!-- <header> -->
+  <!-- - ロゴ、メインナビ（イラスト・About Me） -->
   <header id="main-header">
     <!-- サイトロゴ -->
     <div class="site-title" id="site-logo">
       <!-- JavaScriptでロゴが挿入 -->
     </div>
 
-    <!-- メインページ切替ナビゲーション -->
+    <!-- メインナビ：リンク機能を無効化 -->
     <nav class="main-nav">
       <ul>
-        <li><a href="#" data-page="main-page">イラスト</a></li>
+        <li><a href="#" class="nav-label" data-page="main-page">イラスト</a></li>
         <!--<li><a href="#" data-page="stack-page">技術スタック</a></li>-->
-        <li><a href="#" data-page="profile-page">About Me</a></li>
+        <li><a href="#" class="nav-label" data-page="profile-page">About Me</a></li>
       </ul>
     </nav>
 
@@ -39,14 +43,6 @@
         <li><a href="#fanart-anchor">ファンアート</a></li>
       </ul>
     </nav>
-    <!--
-    <nav class="sub-nav" id="sub-nav-stack" style="display: none;">
-      <ul>
-        <li><a href="#work1">製作物1</a></li>
-        <li><a href="#work2">製作物2</a></li>
-      </ul>
-    </nav>
-  -->
     <nav class="sub-nav" id="sub-nav-profile" style="display: none;">
       <ul>
         <li><a href="#history">経歴</a></li>
@@ -54,8 +50,8 @@
     </nav>
   </header>
 
-
-  <!-- メイン表示領域：各セクションをSPA形式で表示切替 -->
+  <!-- <main> -->
+  <!-- メイン表示領域：各.pageセクション（#main-page, #profile-page など）をSPA形式で表示切替 -->
   <main>
     <!-- メインページ：オリジナル・二次創作・合作 -->
     <section id="main-page" class="page active-page">
@@ -65,12 +61,12 @@
         <div class="original-background-global">
           <div id="original-background"></div>
         </div>
-        <div class="image-container A4-container" id="original"></div>
+        <div class="a4-image-container" id="original"></div>
       </section>
 
       <section class="genre-section" id="collab-anchor">
         <h2>合作</h2>
-        <div class="image-container A4-container" id="collab"></div>
+        <div class="a4-image-container" id="collab"></div>
       </section>
 
       <section class="genre-section" id="fanart-anchor">
@@ -82,35 +78,19 @@
 
         <section class="fanart-subsection kingsraid-section">
           <h3>King's Raid</h3>
-          <div class="image-container A4-container" id="kingsraid"></div>
+          <div class="a4-image-container" id="kingsraid"></div>
         </section>
 
         <section class="fanart-subsection otherfanart-section">
           <h3>Others</h3>
-          <div class="image-container A4-container" id="otherfanart"></div>
+          <div class="a4-image-container" id="otherfanart"></div>
         </section>
       </section>
-
-
     </section>
-
-    <!-- 技術スタックページ -->
-    <!--
-    <section id="stack-page" class="page">
-      <section id="work1">
-        <h2>製作物1</h2>
-        <div class="image-container" data-genre="tech"></div>
-      </section>
-      <section id="work2">
-        <h2>製作物2</h2>
-        <div class="image-container" data-genre="tech"></div>
-      </section>
-    </section>
-    -->
 
     <!-- ユーザー情報ページ -->
-    <section id="profile-page" class="page">
-      <section id="history" class="genre-section">
+    <section class="page" id="profile-page" >
+      <section class="genre-section" id="history" >
         <h2>About Me</h2>
         <p>
           豊橋技術科学大学 修士1年<br>
@@ -122,15 +102,15 @@
           <h3>経歴</h3>
           <ul class="career-timeline">
             <li>
-              <strong>2018年4月〜2023年3月：</strong><br>
+              <strong>2018年4月-2023年3月：</strong><br>
               <span class="institution">東京工業高等専門学校 機械工学科 卒業</span>
             </li>
             <li>
-              <strong>2023年4月〜2025年3月：</strong><br>
+              <strong>2023年4月-2025年3月：</strong><br>
               <span class="institution">豊橋技術科学大学 工学部 機械工学課程 卒業</span>
             </li>
             <li>
-              <strong>2025年4月〜2027年4月：</strong><br>
+              <strong>2025年4月-2027年4月：</strong><br>
               <span class="institution">豊橋技術科学大学大学院 工学研究科 機械工学専攻 卒業見込み</span>
             </li>
           </ul>
@@ -139,8 +119,8 @@
     </section>
   </main>
 
-
-  <!-- フッター：ページ下部のリンク・著作情報 -->
+  <!-- <footer> -->
+  <!-- - .footer-nav、ページ下部のリンク・著作情報 -->
   <footer>
     <nav class="footer-nav">
       <ul>
@@ -151,15 +131,15 @@
         <li><a href="#work1">製作物1</a></li>
         <li><a href="#work2">製作物2</a></li>
         -->
-        <li><a href="#history">About Me</a></li>
+        <li><a href="#history">経歴</a></li>
       </ul>
     </nav>
     <small>&copy; 2025 Soichiro Hano's Illustration Portfolio</small>
   </footer>
 
-
-  <!-- 画像クリック時に表示されるモーダル構造（オーバーレイ表示）、Bodyの最後に書く、ページ全体に1つでOK -->
-  <div id="image-modal" class="modal z-modal">
+  <!-- - モーダル表示用セクション -->
+  <!-- 画像クリック時に表示されるモーダル構造表示（オーバーレイ表示）、Bodyの最後に書く -->
+  <div class="modal z-modal" id="image-modal" >
     <span class="modal-close z-topmost">&times;</span>
     <!-- 左右切り替えボタン -->
     <button class="modal-nav left z-topmost" id="modal-prev">&#10094;</button>
@@ -167,9 +147,9 @@
 
     <div class="modal-body">
       <div class="flip-wrapper">
-        <img id="modal-image-current" class="modal-content flip-front">
+        <img class="modal-content flip-front" id="modal-image-current" >
       </div>
-      <div id="modal-caption" class="z-caption">
+      <div class="z-caption" id="modal-caption" >
         <h3 id="modal-title"></h3>
         <p id="modal-description"></p>
       </div>
@@ -180,13 +160,12 @@
   <!-- 中でモーダル構造を読み込むためモーダル構造構造より後に書く -->
   <script src="main.js"></script>
 
+  <!-- 背景エフェクト・演出DOM -->
   <!-- ポケモン背景専用スライダー：ページ全体に配置 -->
   <div class="poke-background-global">
     <!-- この子要素に画像を配置 -->
     <div id="poke-background-grid"></div>
   </div>
-  </div>
 </body>
-
 
 </html>
