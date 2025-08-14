@@ -53,5 +53,15 @@
     "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--2AUmRlUs--/f_auto,q_auto/v1/portfolio_images/original/Valentine?_a=BAMClqXy0",
     "title": "Valentine",
     "description": ""
+  },
+  "portfolio_images/original/ニホントカゲ": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--E0ytCktE--/f_auto,q_auto/v1/portfolio_images/original/%E3%83%8B%E3%83%9B%E3%83%B3%E3%83%88%E3%82%AB%E3%82%B1%E3%82%99?_a=BAMClqXy0",
+    "title": "ニホントカゲ",
+    "description": ""
+  },
+  "portfolio_images/original/緊急地雷速報": {
+    "url": "https://res.cloudinary.com/dihjz2opk/image/authenticated/s--kQpl5ftd--/f_auto,q_auto/v1/portfolio_images/original/%E7%B7%8A%E6%80%A5%E5%9C%B0%E9%9B%B7%E9%80%9F%E5%A0%B1?_a=BAMClqXy0",
+    "title": "◇緊急地雷速報◇",
+    "description": "「自爆」霊の女の子がモチーフ<br>「幽霊」をテーマとした部活動の有志制作のイラスト集に収録<br>名古屋コミティア2025夏にて頒布"
   }
 }

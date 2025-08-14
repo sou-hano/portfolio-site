@@ -42,12 +42,12 @@ fetch('signed_urls/original.json')
 
         // 表示対象とする画像のpublic_id（拡張子なし）
         targets = [
+            "portfolio_images/original/緊急地雷速報",
             "portfolio_images/original/DearSeraph",
             "portfolio_images/original/ネコザメの卵",
             "portfolio_images/original/饕餮行脚万圣节",
             "portfolio_images/original/桜ねこ",
             "portfolio_images/original/海底撈月",
-            "portfolio_images/original/Dilly-dally"
         ];
 
         // 表示領域のDOM要素を取得
