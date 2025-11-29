@@ -48,6 +48,8 @@ fetch('signed_urls/original.json')
             "portfolio_images/original/饕餮行脚万圣节",
             "portfolio_images/original/桜ねこ",
             "portfolio_images/original/海底撈月",
+            "portfolio_images/original/Dilly-dally",
+            "portfolio_images/original/ドラキュラ",
         ];
 
         // 表示領域のDOM要素を取得
